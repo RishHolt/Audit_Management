@@ -19,73 +19,111 @@ if ($result && $result->num_rows > 0) {
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Cinzel&display=swap" rel="stylesheet">
+	<script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
 	<link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
 	<link rel="stylesheet" href="styles/output.css">
+	<!-- SweetAlert2 CSS -->
+	<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 	<title>Audit Management</title>
 </head>
-<body>
-	<div id="container" class="w-full h-dvh flex flex-col">
+<body class="overflow-hidden">
+	<div id="container" class="w-full h-screen flex flex-col">
 		<div id="header" class="w-full min-h-20 max-h-20 bg-white border-b-2 border-accent">
 			<div class="w-70 h-full flex items-center px-3 py-2 border-r-2 border-accent">
 				<img class="size-full" src="assets/logo.svg" alt="">
 			</div>
 		</div>
-		<div class="size-full flex flex-row">
+		<div class="flex-1 flex flex-row overflow-hidden">
 			<div id="sidebar" class="min-w-70 px-3 py-2 h-full flex flex-col gap-3 bg-white border-r-2 border-accent">
 				<span id="header" class="text-2xl font-bold w-full h-fit text-center">Audit Management</span>
-				<a href="dashboard.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-white">
-					<box-icon type='solid' name='dashboard'></box-icon>
+				<a href="dashboard.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A]">
+					<box-icon name='dashboard' type='solid' color='#4E3B2A'></box-icon>
 					<span>Dashboard</span>
 				</a>
-				<a href="audit-plan.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent">
-					<box-icon type='solid' name='dashboard'></box-icon>
+				<a href="audit-plan.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A]">
+					<box-icon name='calendar-check' type='solid' color='#4E3B2A'></box-icon>
 					<span>Audit Plan</span>
 				</a>
-				<a href="audit-conduct.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent">
-					<box-icon type='solid' name='dashboard'></box-icon>
+				<a href="audit-conduct.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A]">
+					<box-icon name='file-doc' type='solid' color='#4E3B2A'></box-icon>
 					<span>Conduct Audit</span>
 				</a>
-				<a href="audit-findings.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent">
-					<box-icon type='solid' name='dashboard'></box-icon>
+				<a href="audit-findings.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A]">
+					<box-icon name='search-alt-2' type='solid' color='#4E3B2A'></box-icon>
 					<span>Findings</span>
 				</a>
-				<a href="audit-actions.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent">
-					<box-icon type='solid' name='dashboard'></box-icon>
+				<a href="audit-actions.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A]">
+					<box-icon name='check-square' type='solid' color='#4E3B2A'></box-icon>
 					<span>Corrective Actions</span>
 				</a>
-				<a href="audit-logs.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent">
-					<box-icon type='solid' name='dashboard'></box-icon>
+				<a href="audit-logs.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-white text-[#4E3B2A]">
+					<box-icon name='time-five' type='solid' color='#4E3B2A'></box-icon>
 					<span>Audit Logs</span>
 				</a>
 			</div>
-			<div id="main" class="size-full flex flex-col gap-3 px-3 py-2 bg-primary">
-				
-				 <span id="header" class="text-2xl font-bold">Audit Logs</span>
-				 <table class="w-full border-collapse table-auto">
-					<tr class="bg-secondary text-white">
-						<th class="p-1">Log ID</th>
-						<th class="p-1">Action</th>
-						<th class="p-1">Conducted By</th>
-						<th class="p-1">Conducted At</th>
-						<th class="p-1">Details</th>
-					</tr>
-					<?php foreach ($logs as $log): ?>
-					<tr class="bg-white">
-						<td class="p-1"><?= htmlspecialchars($log['LogID']) ?></td>
-						<td class="p-1"><?= htmlspecialchars($log['Action']) ?></td>
-						<td class="p-1"><?= htmlspecialchars($log['ConductedBy']) ?></td>
-						<td class="p-1"><?= htmlspecialchars($log['ConductedAt']) ?></td>
-						<td class="p-1"><?= htmlspecialchars($log['Details']) ?></td>
-					</tr>
-					<?php endforeach; ?>
-					<?php if (empty($logs)): ?>
-					<tr><td colspan="6" class="text-center">No logs found.</td></tr>
-					<?php endif; ?>
-				</table>
+			<div id="main" class="flex-1 flex flex-col gap-3 p-6 bg-primary overflow-hidden">
+				<span id="header" class="text-2xl font-bold text-[#4E3B2A]">Audit Logs</span>
+				<div class="flex-1 overflow-hidden">
+					<div class="w-full h-full overflow-y-auto">
+						<table class="w-full border-collapse table-auto">
+							<thead class="sticky top-0 z-10">
+								<tr class="bg-secondary text-white">
+									<th class="px-4 py-2 whitespace-nowrap w-[10%]">
+										<div class="flex items-center justify-start gap-2">
+											<box-icon name='hash' color='white'></box-icon>
+											Log ID
+										</div>
+									</th>
+									<th class="px-4 py-2 whitespace-nowrap w-[15%]">
+										<div class="flex items-center justify-start gap-2">
+											<box-icon name='text' color='white'></box-icon>
+											Action
+										</div>
+									</th>
+									<th class="px-4 py-2 whitespace-nowrap w-[15%]">
+										<div class="flex items-center justify-start gap-2">
+											<box-icon name='user' color='white'></box-icon>
+											Conducted By
+										</div>
+									</th>
+									<th class="px-4 py-2 whitespace-nowrap w-[20%]">
+										<div class="flex items-center justify-start gap-2">
+											<box-icon name='time' color='white'></box-icon>
+											Conducted At
+										</div>
+									</th>
+									<th class="px-4 py-2 w-[40%]">
+										<div class="flex items-center justify-start gap-2">
+											<box-icon name='info-circle' color='white'></box-icon>
+											Details
+										</div>
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<?php foreach ($logs as $log): ?>
+								<tr class="bg-white border-b border-accent hover:bg-primary transition-colors duration-200">
+									<td class="px-4 py-2 whitespace-nowrap"><?= htmlspecialchars($log['LogID']) ?></td>
+									<td class="px-4 py-2 whitespace-nowrap"><?= htmlspecialchars($log['Action']) ?></td>
+									<td class="px-4 py-2 whitespace-nowrap"><?= htmlspecialchars($log['ConductedBy']) ?></td>
+									<td class="px-4 py-2 whitespace-nowrap"><?= htmlspecialchars($log['ConductedAt']) ?></td>
+									<td class="px-4 py-2 break-words"><?= htmlspecialchars($log['Details']) ?></td>
+								</tr>
+								<?php endforeach; ?>
+								<?php if (empty($logs)): ?>
+								<tr><td colspan="5" class="text-center p-4 text-[#4E3B2A]">No logs found.</td></tr>
+								<?php endif; ?>
+							</tbody>
+						</table>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
-</body>
-	<script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+	<!-- SweetAlert2 JS -->
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<!-- Custom SweetAlert2 Utility Functions -->
+	<script src="js/sweetalert.js"></script>
+</body>
 </html>

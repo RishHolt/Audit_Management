@@ -7,10 +7,13 @@
 	--color-accent: #f7e6ca;
 }
 
-#header {
-	font-family: "Cinzel", serif;
+/* Base text color */
+body {
+	color: var(--color-text);
 }
 
-/* span {
-	color: #4e3b2a;
-} */
+/* Direct header ID targeting */
+[id="header"] {
+	color: var(--color-text) !important;
+	font-family: "Cinzel", serif;
+}
