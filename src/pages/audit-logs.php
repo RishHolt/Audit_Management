@@ -1,6 +1,6 @@
 <?php 
 
-include 'php/conn.php';
+include '../php/conn.php';
 $logs = [];
 $result = $conn->query("SELECT * FROM auditlogs ORDER BY LogID DESC");
 if ($result && $result->num_rows > 0) {
@@ -21,7 +21,7 @@ if ($result && $result->num_rows > 0) {
 	<link href="https://fonts.googleapis.com/css2?family=Cinzel&display=swap" rel="stylesheet">
 	<script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
 	<link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
-	<link rel="stylesheet" href="styles/output.css">
+	<link rel="stylesheet" href="../styles/output.css">
 	<!-- SweetAlert2 CSS -->
 	<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 	<title>Audit Management</title>
@@ -30,33 +30,33 @@ if ($result && $result->num_rows > 0) {
 	<div id="container" class="w-full h-screen flex flex-col">
 		<div id="header" class="w-full min-h-20 max-h-20 bg-white border-b-2 border-accent">
 			<div class="w-70 h-full flex items-center px-3 py-2 border-r-2 border-accent">
-				<img class="size-full" src="assets/logo.svg" alt="">
+				<img class="size-full" src="../assets/logo.svg" alt="">
 			</div>
 		</div>
 		<div class="flex-1 flex flex-row overflow-hidden">
 			<div id="sidebar" class="min-w-70 px-3 py-2 h-full flex flex-col gap-3 bg-white border-r-2 border-accent">
 				<span id="header" class="text-2xl font-bold w-full h-fit text-center">Audit Management</span>
-				<a href="dashboard.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A]">
+				<a href="dashboard.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
 					<box-icon name='dashboard' type='solid' color='#4E3B2A'></box-icon>
 					<span>Dashboard</span>
 				</a>
-				<a href="audit-plan.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A]">
+				<a href="audit-plan.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
 					<box-icon name='calendar-check' type='solid' color='#4E3B2A'></box-icon>
 					<span>Audit Plan</span>
 				</a>
-				<a href="audit-conduct.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A]">
+				<a href="audit-conduct.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
 					<box-icon name='file-doc' type='solid' color='#4E3B2A'></box-icon>
 					<span>Conduct Audit</span>
 				</a>
-				<a href="audit-findings.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A]">
+				<a href="audit-findings.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
 					<box-icon name='search-alt-2' type='solid' color='#4E3B2A'></box-icon>
 					<span>Findings</span>
 				</a>
-				<a href="audit-actions.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A]">
+				<a href="audit-actions.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
 					<box-icon name='check-square' type='solid' color='#4E3B2A'></box-icon>
 					<span>Corrective Actions</span>
 				</a>
-				<a href="audit-logs.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-white text-[#4E3B2A]">
+				<a href="audit-logs.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-white text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
 					<box-icon name='time-five' type='solid' color='#4E3B2A'></box-icon>
 					<span>Audit Logs</span>
 				</a>
@@ -124,6 +124,6 @@ if ($result && $result->num_rows > 0) {
 	<!-- SweetAlert2 JS -->
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<!-- Custom SweetAlert2 Utility Functions -->
-	<script src="js/sweetalert.js"></script>
+	<script src="../js/sweetalert.js"></script>
 </body>
 </html>
