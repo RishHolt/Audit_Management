@@ -8,6 +8,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $department = $_POST['Department'];
     $scheduledDate = $_POST['ScheduledDate'];
     $description = $_POST['Description'] ?? '';
+    $auditType = $_POST['AuditType'] ?? 'planned';
     $status = 'Scheduled';
 
     // Validate required fields

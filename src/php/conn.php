@@ -1,78 +1,52 @@
 <?php
-// Start session for CSRF protection
-session_start();
+// Prevent multiple inclusion
+if (defined('DB_CONFIG_INCLUDED')) {
+    return;
+}
 
-// Database configuration
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'logs2_audit_management');
+// Start session for CSRF protection if not already started
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Database configuration - using const for better performance
+const DB_HOST = 'localhost';
+const DB_USER = 'root';
+const DB_PASS = '';
+const DB_NAME = 'logs2_audit_management';
+const DB_NAME_FINANCIALS = 'logs2_audit_financials';
+
+// Mark as included
+define('DB_CONFIG_INCLUDED', true);
 
 // Generate CSRF token if not exists
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// Helper Functions
-function sanitizeInput($input) {
-    if (is_array($input)) {
-        return array_map('sanitizeInput', $input);
-    }
-    return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
-}
-
-function getPaginatedResults($query, $page = 1, $perPage = 10) {
-    global $conn;
-    $offset = ($page - 1) * $perPage;
-    
-    // Get total count
-    $countQuery = "SELECT COUNT(*) as total FROM (" . $query . ") as subquery";
-    $totalResult = $conn->query($countQuery);
-    $total = $totalResult->fetch_assoc()['total'];
-    
-    // Get paginated results
-    $result = $conn->query($query . " LIMIT $perPage OFFSET $offset");
-    $data = $result->fetch_all(MYSQLI_ASSOC);
-    
-    return [
-        'data' => $data,
-        'total' => $total,
-        'pages' => ceil($total / $perPage),
-        'current_page' => $page
-    ];
-}
-
-function validateCSRF() {
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-            header('Content-Type: application/json');
-            http_response_code(403);
-            die(json_encode([
-                'success' => false,
-                'message' => 'Invalid CSRF token'
-            ]));
-        }
-    }
-}
-
-function jsonResponse($data, $status = 200) {
-    header('Content-Type: application/json');
-    http_response_code($status);
-    echo json_encode($data);
-    exit;
-}
+// Include database helpers first
+require_once __DIR__ . '/database_helpers.php';
 
 // Error handling
 try {
+    // Connect to main audit management database
     $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-    
     if ($conn->connect_error) {
-        throw new Exception("Connection failed: " . $conn->connect_error);
+        throw new Exception("Main database connection failed: " . $conn->connect_error);
     }
     
-    // Set charset to ensure proper encoding
+    // Connect to financial audit database
+    $connFinancials = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME_FINANCIALS);
+    if ($connFinancials->connect_error) {
+        throw new Exception("Financial database connection failed: " . $connFinancials->connect_error);
+    }
+    
+    // Set charset for both connections
     if (!$conn->set_charset("utf8mb4")) {
-        throw new Exception("Error setting charset: " . $conn->error);
+        throw new Exception("Error setting charset for main database: " . $conn->error);
+    }
+    if (!$connFinancials->set_charset("utf8mb4")) {
+        throw new Exception("Error setting charset for financial database: " . $connFinancials->error);
     }
 
     // Set timezone

@@ -2,12 +2,41 @@
 
 include '../php/conn.php';
 $logs = [];
-$result = $conn->query("SELECT * FROM auditlogs ORDER BY LogID DESC");
-if ($result && $result->num_rows > 0) {
-    while ($log = $result->fetch_assoc()) {
+// Fetch audit logs (main) and financial audit logs (from financial_audit_gl)
+$mainLogs = $conn->query("SELECT *, 'main' as Source FROM auditlogs ORDER BY LogID DESC");
+if ($mainLogs && $mainLogs->num_rows > 0) {
+    while ($log = $mainLogs->fetch_assoc()) {
         $logs[] = $log;
     }
 }
+// Fetch financial audit logs (GL) directly from financial_audit_gl for display
+$finLogsQuery = "SELECT 
+    fa.AuditID,
+    fa.EntryID,
+    fa.Status,
+    fa.ReviewedBy,
+    fa.AuditDate,
+    je.Amount,
+    je.EntryType,
+    je.Description,
+    fa.Notes,
+    'financial' as Source
+FROM 
+    " . DB_NAME_FINANCIALS . ".financial_audit_gl fa
+LEFT JOIN " . DB_NAME_FINANCIALS . ".journalentries je ON fa.EntryID = je.EntryID
+ORDER BY fa.AuditDate DESC";
+$finLogs = $connFinancials->query($finLogsQuery);
+if ($finLogs && $finLogs->num_rows > 0) {
+    while ($log = $finLogs->fetch_assoc()) {
+        $logs[] = $log;
+    }
+}
+// Sort all logs by date/time (ConductedAt or AuditDate)
+usort($logs, function($a, $b) {
+    $aTime = isset($a['ConductedAt']) ? strtotime($a['ConductedAt']) : (isset($a['AuditDate']) ? strtotime($a['AuditDate']) : 0);
+    $bTime = isset($b['ConductedAt']) ? strtotime($b['ConductedAt']) : (isset($b['AuditDate']) ? strtotime($b['AuditDate']) : 0);
+    return $bTime <=> $aTime;
+});
 
 ?>
 
@@ -48,6 +77,10 @@ if ($result && $result->num_rows > 0) {
 					<box-icon name='file-doc' type='solid' color='#4E3B2A'></box-icon>
 					<span>Conduct Audit</span>
 				</a>
+				<a href="financial-audit-gl.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-white text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
+                    <box-icon name='dollar-circle' type='solid' color='#4E3B2A'></box-icon>
+                    <span>Financial Audit (GL)</span>
+                </a>
 				<a href="audit-findings.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
 					<box-icon name='search-alt-2' type='solid' color='#4E3B2A'></box-icon>
 					<span>Findings</span>
@@ -68,10 +101,16 @@ if ($result && $result->num_rows > 0) {
 						<table class="w-full border-collapse table-auto">
 							<thead class="sticky top-0 z-10">
 								<tr class="bg-secondary text-white">
-									<th class="px-4 py-2 whitespace-nowrap w-[10%]">
+									<th class="px-4 py-2 whitespace-nowrap w-[8%]">
 										<div class="flex items-center justify-start gap-2">
 											<box-icon name='hash' color='white'></box-icon>
 											Log ID
+										</div>
+									</th>
+									<th class="px-4 py-2 whitespace-nowrap w-[10%]">
+										<div class="flex items-center justify-start gap-2">
+											<box-icon name='hash' color='white'></box-icon>
+											Audit ID
 										</div>
 									</th>
 									<th class="px-4 py-2 whitespace-nowrap w-[15%]">
@@ -86,13 +125,13 @@ if ($result && $result->num_rows > 0) {
 											Conducted By
 										</div>
 									</th>
-									<th class="px-4 py-2 whitespace-nowrap w-[20%]">
+									<th class="px-4 py-2 whitespace-nowrap w-[15%]">
 										<div class="flex items-center justify-start gap-2">
 											<box-icon name='time' color='white'></box-icon>
-											Conducted At
+											Timestamp
 										</div>
 									</th>
-									<th class="px-4 py-2 w-[40%]">
+									<th class="px-4 py-2 w-[37%]">
 										<div class="flex items-center justify-start gap-2">
 											<box-icon name='info-circle' color='white'></box-icon>
 											Details
@@ -102,17 +141,40 @@ if ($result && $result->num_rows > 0) {
 							</thead>
 							<tbody>
 								<?php foreach ($logs as $log): ?>
-								<tr class="bg-white border-b border-accent hover:bg-primary transition-colors duration-200">
-									<td class="px-4 py-2 whitespace-nowrap"><?= htmlspecialchars($log['LogID']) ?></td>
-									<td class="px-4 py-2 whitespace-nowrap"><?= htmlspecialchars($log['Action']) ?></td>
-									<td class="px-4 py-2 whitespace-nowrap"><?= htmlspecialchars($log['ConductedBy']) ?></td>
-									<td class="px-4 py-2 whitespace-nowrap"><?= htmlspecialchars($log['ConductedAt']) ?></td>
-									<td class="px-4 py-2 break-words"><?= htmlspecialchars($log['Details']) ?></td>
-								</tr>
-								<?php endforeach; ?>
-								<?php if (empty($logs)): ?>
-								<tr><td colspan="5" class="text-center p-4 text-[#4E3B2A]">No logs found.</td></tr>
-								<?php endif; ?>
+        <tr class="bg-white border-b border-accent hover:bg-primary transition-colors duration-200">
+            <td class="px-4 py-2 whitespace-nowrap">
+                <?= isset($log['LogID']) ? htmlspecialchars($log['LogID']) : '<span class="text-gray-400">N/A</span>' ?>
+            </td>
+            <td class="px-4 py-2 whitespace-nowrap">
+                <?= isset($log['AuditID']) ? htmlspecialchars($log['AuditID']) : (isset($log['EntryID']) ? 'GL#' . htmlspecialchars($log['EntryID']) : '<span class="text-gray-400">N/A</span>') ?>
+            </td>
+            <td class="px-4 py-2 whitespace-nowrap">
+                <?php if (isset($log['Source']) && $log['Source'] === 'financial'): ?>
+                    Financial GL Audit
+                <?php else: ?>
+                    <?= htmlspecialchars($log['Action']) ?>
+                <?php endif; ?>
+            </td>
+            <td class="px-4 py-2 whitespace-nowrap">
+                <?= isset($log['ConductedBy']) ? htmlspecialchars($log['ConductedBy']) : (isset($log['ReviewedBy']) ? htmlspecialchars($log['ReviewedBy']) : '<span class="text-gray-400">N/A</span>') ?>
+            </td>
+            <td class="px-4 py-2 whitespace-nowrap">
+                <?= isset($log['ConductedAt']) ? htmlspecialchars($log['ConductedAt']) : (isset($log['AuditDate']) ? htmlspecialchars($log['AuditDate']) : '<span class="text-gray-400">N/A</span>') ?>
+            </td>
+            <td class="px-4 py-2 break-words">
+                <?php if (isset($log['Source']) && $log['Source'] === 'financial'): ?>
+                    Amount: <?= number_format($log['Amount'], 2) ?> | Type: <?= htmlspecialchars($log['EntryType']) ?> | Status: <?= htmlspecialchars($log['Status']) ?><br>
+                    <?= htmlspecialchars($log['Description']) ?><br>
+                    Notes: <?= htmlspecialchars($log['Notes']) ?>
+                <?php else: ?>
+                    <?= htmlspecialchars($log['Details']) ?>
+                <?php endif; ?>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+    <?php if (empty($logs)): ?>
+        <tr><td colspan="6" class="text-center p-4 text-[#4E3B2A]">No logs found.</td></tr>
+    <?php endif; ?>
 							</tbody>
 						</table>
 					</div>

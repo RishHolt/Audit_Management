@@ -8,11 +8,10 @@ try {
         throw new Exception('Invalid request method');
     }
 
-    if (!isset($_POST['PlanID']) || !isset($_POST['ConductingBy'])) {
-        throw new Exception('Missing required fields');
+    if (!isset($_POST['ConductingBy'])) {
+        throw new Exception('Missing conductor information');
     }
 
-    $planID = $_POST['PlanID'];
     $conductingBy = $_POST['ConductingBy'];
     $status = 'Pending';
     $conductedAt = date('Y-m-d H:i:s');
@@ -21,13 +20,37 @@ try {
     $conn->begin_transaction();
 
     try {
-        // Insert into audit table
-        $stmt = $conn->prepare("INSERT INTO audit (PlanID, ConductingBy, ConductedAt, Status) VALUES (?, ?, ?, ?)");
-        if (!$stmt) {
-            throw new Exception("Failed to prepare audit statement: " . $conn->error);
+        if (isset($_POST['isCustom'])) {
+            // Handle custom audit
+            if (!isset($_POST['Title']) || !isset($_POST['Description']) || !isset($_POST['Department'])) {
+                throw new Exception('Missing title, description, or department for custom audit');
+            }
+
+            $title = $_POST['Title'];
+            $description = $_POST['Description'];
+            $department = $_POST['Department'];
+            $planID = null; // Custom audits don't need a plan ID
+
+            // Insert custom audit with title, description, department
+            $stmt = $conn->prepare("INSERT INTO audit (PlanID, Title, Description, Department, ConductingBy, ConductedAt, Status) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            if (!$stmt) {
+                throw new Exception("Failed to prepare audit statement: " . $conn->error);
+            }
+            $stmt->bind_param("issssss", $planID, $title, $description, $department, $conductingBy, $conductedAt, $status);
+        } else {
+            // Handle plan-based audit
+            if (!isset($_POST['PlanID'])) {
+                throw new Exception('Missing plan ID');
+            }
+            $planID = $_POST['PlanID'];
+            // Insert plan-based audit (no custom title/desc/department)
+            $stmt = $conn->prepare("INSERT INTO audit (PlanID, ConductingBy, ConductedAt, Status) VALUES (?, ?, ?, ?)");
+            if (!$stmt) {
+                throw new Exception("Failed to prepare audit statement: " . $conn->error);
+            }
+            $stmt->bind_param("isss", $planID, $conductingBy, $conductedAt, $status);
         }
-        
-        $stmt->bind_param("isss", $planID, $conductingBy, $conductedAt, $status);
+
         if (!$stmt->execute()) {
             throw new Exception("Failed to create audit: " . $stmt->error);
         }
@@ -35,20 +58,24 @@ try {
         // Get the new AuditID
         $newAuditID = $conn->insert_id;
 
-        // Update auditplan status to Assigned
-        $updateStmt = $conn->prepare("UPDATE auditplan SET Status='Assigned' WHERE PlanID=?");
-        if (!$updateStmt) {
-            throw new Exception("Failed to prepare update statement: " . $conn->error);
-        }
-        
-        $updateStmt->bind_param("i", $planID);
-        if (!$updateStmt->execute()) {
-            throw new Exception("Failed to update plan status: " . $updateStmt->error);
+        // Update auditplan status to Assigned if it's not a custom audit
+        if (!isset($_POST['isCustom'])) {
+            $updateStmt = $conn->prepare("UPDATE auditplan SET Status='Assigned' WHERE PlanID=?");
+            if (!$updateStmt) {
+                throw new Exception("Failed to prepare update statement: " . $conn->error);
+            }
+            
+            $updateStmt->bind_param("i", $planID);
+            if (!$updateStmt->execute()) {
+                throw new Exception("Failed to update plan status: " . $updateStmt->error);
+            }
         }
 
         // Log the action
         $action = "Conduct Audit";
-        $details = "Audit conducted for PlanID: " . $planID;
+        $details = isset($_POST['isCustom']) 
+            ? "Custom audit created: " . $title 
+            : "Audit conducted for PlanID: " . $planID;
         $logStmt = $conn->prepare("INSERT INTO auditlogs (AuditID, Action, ConductedBy, ConductedAt, Details) VALUES (?, ?, ?, NOW(), ?)");
         if (!$logStmt) {
             throw new Exception("Failed to prepare log statement: " . $conn->error);

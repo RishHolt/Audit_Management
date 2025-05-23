@@ -55,6 +55,10 @@ if ($planResult && $planResult->num_rows > 0) {
 					<box-icon name='file-doc' type='solid' color='#4E3B2A'></box-icon>
 					<span>Conduct Audit</span>
 				</a>
+                <a href="financial-audit-gl.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-white text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
+                    <box-icon name='dollar-circle' type='solid' color='#4E3B2A'></box-icon>
+                    <span>Financial Audit (GL)</span>
+                </a>
 				<a href="audit-findings.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
 					<box-icon name='search-alt-2' type='solid' color='#4E3B2A'></box-icon>
 					<span>Findings</span>
@@ -84,7 +88,14 @@ if ($planResult && $planResult->num_rows > 0) {
                                 <box-icon name='x'></box-icon>
                             </button>
                         </div>
-                        <form onsubmit="handleConductAudit(event)" action="../php/conduct-audit.php" method="post" class="flex flex-col gap-3">
+                        <div class="mb-4">
+                            <div class="flex gap-3">
+                                <button type="button" onclick="showAuditForm('plan')" class="flex-1 px-3 py-2 bg-secondary text-white rounded-md">Select Plan Audit</button>
+                                <button type="button" onclick="showAuditForm('custom')" class="flex-1 px-3 py-2 bg-secondary text-white rounded-md">Create Custom Audit</button>
+                            </div>
+                        </div>
+                        <!-- Plan Audit Form -->
+                        <form id="planAuditForm" onsubmit="handleConductAudit(event)" action="../php/conduct-audit.php" method="post" class="hidden flex-col gap-3">
                             <div class="flex flex-col">
                                 <label for="PlanID">Select Audit Plan:</label>
                                 <select name="PlanID" id="PlanID" required class="px-3 py-2 border rounded-lg bg-white focus:ring-2 focus:ring-accent focus:border-accent">
@@ -97,10 +108,35 @@ if ($planResult && $planResult->num_rows > 0) {
                                 </select>
                             </div>
                             <div class="flex flex-col">
-                                <label for="ConductingBy">Conducting By:</label>
-                                <input type="text" name="ConductingBy" id="ConductingBy" required placeholder="Enter conductor's name..." class="px-3 py-2 border rounded-lg bg-white focus:ring-2 focus:ring-accent focus:border-accent">
+                                <label for="planConductingBy">Conducting By:</label>
+                                <input type="text" name="ConductingBy" id="planConductingBy" required placeholder="Enter conductor's name..." class="px-3 py-2 border rounded-lg bg-white focus:ring-2 focus:ring-accent focus:border-accent">
                             </div>
                             <input type="hidden" name="Status" value="Pending">
+                            <div class="flex justify-end">
+                                <button type="submit" class="px-3 py-2 bg-secondary text-white rounded-md">Submit</button>
+                            </div>
+                        </form>
+                        
+                        <!-- Custom Audit Form -->
+                        <form id="customAuditForm" onsubmit="handleCustomAudit(event)" action="../php/conduct-audit.php" method="post" class="hidden flex-col gap-3">
+                            <div class="flex flex-col">
+                                <label for="Title">Audit Title:</label>
+                                <input type="text" name="Title" id="Title" required placeholder="Enter audit title..." class="px-3 py-2 border rounded-lg bg-white focus:ring-2 focus:ring-accent focus:border-accent">
+                            </div>
+                            <div class="flex flex-col">
+                                <label for="Description">Description:</label>
+                                <textarea name="Description" id="Description" required placeholder="Enter audit description..." rows="3" class="px-3 py-2 border rounded-lg bg-white focus:ring-2 focus:ring-accent focus:border-accent"></textarea>
+                            </div>
+                            <div class="flex flex-col">
+                                <label for="Department">Department:</label>
+                                <input type="text" name="Department" id="Department" required placeholder="Enter department name..." class="px-3 py-2 border rounded-lg bg-white focus:ring-2 focus:ring-accent focus:border-accent">
+                            </div>
+                            <div class="flex flex-col">
+                                <label for="customConductingBy">Conducting By:</label>
+                                <input type="text" name="ConductingBy" id="customConductingBy" required placeholder="Enter conductor's name..." class="px-3 py-2 border rounded-lg bg-white focus:ring-2 focus:ring-accent focus:border-accent">
+                            </div>
+                            <input type="hidden" name="Status" value="Pending">
+                            <input type="hidden" name="isCustom" value="1">
                             <div class="flex justify-end">
                                 <button type="submit" class="px-3 py-2 bg-secondary text-white rounded-md">Submit</button>
                             </div>
@@ -156,9 +192,14 @@ if ($planResult && $planResult->num_rows > 0) {
                     <?php
                     // Fetch conducted audits
                     $auditResult = $conn->query(
-                        "SELECT ac.AuditID, ac.PlanID, ap.Title, ac.ConductingBy, ac.ConductedAt, ac.Status
+                        "SELECT ac.AuditID, ac.PlanID, 
+                                CASE 
+                                    WHEN ac.PlanID IS NULL THEN ac.Title
+                                    ELSE ap.Title 
+                                END as Title,
+                                ac.ConductingBy, ac.ConductedAt, ac.Status
                          FROM audit ac
-                         JOIN auditplan ap ON ac.PlanID = ap.PlanID
+                         LEFT JOIN auditplan ap ON ac.PlanID = ap.PlanID
                          ORDER BY ac.AuditID DESC"
                     );
                     $auditModals = [];
@@ -339,6 +380,119 @@ if ($planResult && $planResult->num_rows > 0) {
     <!-- Custom SweetAlert2 Utility Functions -->
     <script src="../js/sweetalert.js"></script>
     <script>
+        // Function to show/hide forms
+        function showAuditForm(type) {
+            const planForm = document.getElementById('planAuditForm');
+            const customForm = document.getElementById('customAuditForm');
+            
+            if (type === 'plan') {
+                planForm.classList.remove('hidden');
+                planForm.classList.add('flex');
+                customForm.classList.remove('flex');
+                customForm.classList.add('hidden');
+            } else {
+                customForm.classList.remove('hidden');
+                customForm.classList.add('flex');
+                planForm.classList.remove('flex');
+                planForm.classList.add('hidden');
+            }
+        }
+
+        // Show plan form by default when modal opens
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('conduct-modal');
+            if (modal) {
+                modal.addEventListener('shown.bs.modal', function() {
+                    showAuditForm('plan');
+                });
+            }
+        });
+
+        // Handle Plan-based Audit
+        async function handleConductAudit(event) {
+            event.preventDefault();
+            try {
+                showLoading('Starting plan-based audit...');
+                const form = event.target;
+                const formData = new FormData(form);
+                
+                const response = await fetch('../php/conduct-audit.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                if (!data.success) {
+                    throw new Error(data.message || 'Failed to start audit');
+                }
+
+                await showSuccessWithRefresh(data.message);
+            } catch (error) {
+                console.error('Conduct audit error:', error);
+                await showError(error.message);
+            } finally {
+                closeLoading();
+            }
+        }
+
+        // Handle Custom Audit
+        async function handleCustomAudit(event) {
+            event.preventDefault();
+            try {
+                showLoading('Creating custom audit...');
+                const form = event.target;
+                const formData = new FormData(form);
+                formData.append('isCustom', '1'); // Ensure isCustom is set
+                
+                const response = await fetch('../php/conduct-audit.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                if (!data.success) {
+                    throw new Error(data.message || 'Failed to create custom audit');
+                }
+
+                await showSuccessWithRefresh(data.message);
+            } catch (error) {
+                console.error('Custom audit error:', error);
+                await showError(error.message);
+            } finally {
+                closeLoading();
+            }
+        }
+
+        // Handle Custom Audit
+        async function handleCustomAudit(event) {
+            event.preventDefault();
+            try {
+                showLoading('Starting custom audit...');
+                const form = event.target;
+                const formData = new FormData(form);
+                const response = await fetch('../php/conduct-audit.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error('Unexpected response from server');
+                }
+
+                const data = await response.json();
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || 'Failed to start custom audit');
+                }
+                
+                await showSuccessWithRefresh(data.message);
+            } catch (error) {
+                console.error('Custom audit error:', error);
+                await showError(error.message);
+            } finally {
+                closeLoading();
+            }
+        }
         // Handle Conduct Audit
         async function handleConductAudit(event) {
             event.preventDefault();

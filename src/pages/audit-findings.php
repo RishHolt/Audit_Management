@@ -102,6 +102,10 @@ error_log("All Findings: " . print_r($findings, true));
 					<box-icon name='file-doc' type='solid' color='#4E3B2A'></box-icon>
 					<span>Conduct Audit</span>
 				</a>
+				<a href="financial-audit-gl.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-white text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
+                    <box-icon name='dollar-circle' type='solid' color='#4E3B2A'></box-icon>
+                    <span>Financial Audit (GL)</span>
+                </a>
 				<a href="audit-findings.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-white text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
 					<box-icon name='search-alt-2' type='solid' color='#4E3B2A'></box-icon>
 					<span>Findings</span>

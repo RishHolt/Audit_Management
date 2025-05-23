@@ -96,6 +96,24 @@ $correctiveActions = $conn->query("
         ca.DueDate ASC 
     LIMIT 5");
 
+// Financial Audit Statistics
+$totalFinancialAudits = $conn->query("SELECT COUNT(*) as count FROM financial_audit_gl")->fetch_assoc()['count'];
+$pendingFinancialAudits = $conn->query("SELECT COUNT(*) as count FROM financial_audit_gl WHERE Status = 'Pending'")->fetch_assoc()['count'];
+$flaggedEntries = $conn->query("SELECT COUNT(*) as count FROM financial_audit_gl WHERE Status = 'Flagged'")->fetch_assoc()['count'];
+$reviewedEntries = $conn->query("SELECT COUNT(*) as count FROM financial_audit_gl WHERE Status = 'Reviewed'")->fetch_assoc()['count'];
+
+// Financial audit completion rate
+$totalJournalEntries = $conn->query("SELECT COUNT(*) as count FROM journalentries")->fetch_assoc()['count'];
+$auditCompletionRate = $totalJournalEntries > 0 ? round(($totalFinancialAudits / $totalJournalEntries) * 100, 1) : 0;
+
+// Month-over-month financial audit change
+$currentMonthFinAudits = $conn->query("SELECT COUNT(*) as count FROM financial_audit_gl 
+    WHERE MONTH(AuditDate) = $currentMonth AND YEAR(AuditDate) = $currentYear")->fetch_assoc()['count'];
+$lastMonthFinAudits = $conn->query("SELECT COUNT(*) as count FROM financial_audit_gl 
+    WHERE MONTH(AuditDate) = $lastMonth AND YEAR(AuditDate) = $lastYear")->fetch_assoc()['count'];
+$finAuditChange = $lastMonthFinAudits > 0 ? 
+    round((($currentMonthFinAudits - $lastMonthFinAudits) / $lastMonthFinAudits) * 100, 1) : 0;
+
 ?>
 
 <!DOCTYPE html>
@@ -135,6 +153,10 @@ $correctiveActions = $conn->query("
 					<box-icon name='file-doc' type='solid' color='#4E3B2A'></box-icon>
 					<span>Conduct Audit</span>
 				</a>
+				<a href="financial-audit-gl.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-white text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
+                    <box-icon name='dollar-circle' type='solid' color='#4E3B2A'></box-icon>
+                    <span>Financial Audit (GL)</span>
+                </a>
 				<a href="audit-findings.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A]">
 					<box-icon name='search-alt-2' type='solid' color='#4E3B2A'></box-icon>
 					<span>Findings</span>
@@ -143,6 +165,7 @@ $correctiveActions = $conn->query("
 					<box-icon name='check-square' type='solid' color='#4E3B2A'></box-icon>
 					<span>Corrective Actions</span>
 				</a>
+
 				<a href="audit-logs.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A]">
 					<box-icon name='time-five' type='solid' color='#4E3B2A'></box-icon>
 					<span>Audit Logs</span>
@@ -164,8 +187,7 @@ $correctiveActions = $conn->query("
 								<p class="text-2xl font-bold text-[#4E3B2A]"><?= $totalAudits ?></p>
 								<div class="flex items-center mt-2">
 									<span class="text-sm <?= $auditChange >= 0 ? 'text-green-600' : 'text-red-600' ?>">
-										<?= $auditChange ?>% 
-										<?= $auditChange >= 0 ? '↑' : '↓' ?>
+										<?= $auditChange ?>% <?= $auditChange >= 0 ? '↑' : '↓' ?>
 									</span>
 									<span class="text-xs text-gray-500 ml-1">vs last month</span>
 								</div>
@@ -175,21 +197,21 @@ $correctiveActions = $conn->query("
 							</div>
 						</div>
 					</div>
-
-					<!-- Ongoing Audits Card -->
+					
+					<!-- Active Audits Card -->
 					<div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
 						<div class="flex items-start justify-between">
 							<div>
-								<p class="text-sm font-semibold mb-1 text-gray-600">Ongoing Audits</p>
+								<p class="text-sm font-semibold mb-1 text-gray-600">Active Audits</p>
 								<p class="text-2xl font-bold text-[#4E3B2A]"><?= $totalOngoing ?></p>
 								<div class="flex items-center mt-2">
 									<span class="text-xs text-gray-500">
-										<?= $ongoingAudits ?> Pending • <?= $underReviewAudits ?> Under Review
+										<?= $ongoingAudits ?> pending, <?= $underReviewAudits ?> in review
 									</span>
 								</div>
 							</div>
-							<div class="p-2 bg-green-100 rounded-full">
-								<box-icon name='time' type='solid' color='#22c55e' size="md"></box-icon>
+							<div class="p-2 bg-yellow-100 rounded-full">
+								<box-icon name='loader-circle' type='solid' color='#eab308' size="md"></box-icon>
 							</div>
 						</div>
 					</div>
@@ -202,30 +224,30 @@ $correctiveActions = $conn->query("
 								<p class="text-2xl font-bold text-[#4E3B2A]"><?= $complianceRate ?>%</p>
 								<div class="flex items-center mt-2">
 									<span class="text-xs text-gray-500">
-										<?= $compliantFindings ?> of <?= $totalFindings ?> findings compliant
+										<?= $compliantFindings ?> of <?= $totalFindings ?> compliant
 									</span>
 								</div>
 							</div>
-							<div class="p-2 bg-purple-100 rounded-full">
-								<box-icon name='check-circle' type='solid' color='#a855f7' size="md"></box-icon>
+							<div class="p-2 bg-green-100 rounded-full">
+								<box-icon name='check-circle' type='solid' color='#22c55e' size="md"></box-icon>
 							</div>
 						</div>
 					</div>
 
-					<!-- Pending Actions Card -->
+					<!-- Financial Audit Status Card -->
 					<div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
 						<div class="flex items-start justify-between">
 							<div>
-								<p class="text-sm font-semibold mb-1 text-gray-600">Pending Actions</p>
-								<p class="text-2xl font-bold text-[#4E3B2A]"><?= $pendingActions ?></p>
+								<p class="text-sm font-semibold mb-1 text-gray-600">Financial Audits</p>
+								<p class="text-2xl font-bold text-[#4E3B2A]"><?= $auditCompletionRate ?>%</p>
 								<div class="flex items-center mt-2">
 									<span class="text-xs text-gray-500">
-										<?= $highPriorityActions ?> high priority actions
+										<?= $pendingFinancialAudits ?> pending, <?= $flaggedEntries ?> flagged
 									</span>
 								</div>
 							</div>
-							<div class="p-2 bg-yellow-100 rounded-full">
-								<box-icon name='bell' type='solid' color='#eab308' size="md"></box-icon>
+							<div class="p-2 bg-purple-100 rounded-full">
+								<box-icon name='dollar-circle' type='solid' color='#a855f7' size="md"></box-icon>
 							</div>
 						</div>
 					</div>
@@ -267,6 +289,15 @@ $correctiveActions = $conn->query("
 							<a href="audit-actions.php" class="text-accent hover:underline">View All</a>
 						</div>
 						<?php include '../components/pending-actions-table.php'; ?>
+					</div>
+
+					<!-- Recent Financial Audits -->
+					<div class="bg-white rounded-lg shadow-sm p-6">
+						<div class="flex justify-between items-center mb-4">
+							<h2 class="text-lg font-semibold text-[#4E3B2A]">Recent Financial Audits</h2>
+							<a href="financial-audit-gl.php" class="text-accent hover:underline">View All</a>
+						</div>
+						<?php include '../components/recent-financial-audits-table.php'; ?>
 					</div>
 				</div>
 			</div>
