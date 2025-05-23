@@ -10,7 +10,7 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 
 // Database configuration - using const for better performance
-const DB_HOST = 'localhost';
+const DB_HOST = 'localhost:3307';
 const DB_USER = 'root';
 const DB_PASS = '';
 const DB_NAME = 'logs2_audit_management';

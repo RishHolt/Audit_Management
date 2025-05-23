@@ -30,10 +30,11 @@ SET time_zone = "+00:00";
 CREATE TABLE `audit` (
   `AuditID` int(11) NOT NULL,
   `PlanID` int(11) DEFAULT NULL,
+  `Title` varchar(255) NOT NULL,
   `ConductingBy` varchar(100) DEFAULT NULL,
   `ConductedAt` datetime DEFAULT NULL,
   `Status` enum('Pending','Under Review','Completed','Cancelled') DEFAULT 'Pending'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDBDEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
