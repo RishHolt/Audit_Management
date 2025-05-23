@@ -5,15 +5,20 @@ include '../php/conn.php';
 $query = "SELECT 
     je.EntryID,
     je.AccountID,
+    a.AccountName,
     je.EntryType,
     je.Amount,
     je.EntryDate,
     je.Description,
+    t.TransactionFrom,
+    t.TransactionDate,
     fa.AuditID,
     fa.Status as AuditStatus,
     fa.ReviewedBy,
     fa.AuditDate
 FROM " . DB_NAME_FINANCIALS . ".journalentries je
+LEFT JOIN " . DB_NAME_FINANCIALS . ".accounts a ON je.AccountID = a.AccountID
+LEFT JOIN " . DB_NAME_FINANCIALS . ".transactions t ON je.TransactionID = t.TransactionID
 LEFT JOIN " . DB_NAME . ".financial_audit_gl fa ON je.EntryID = fa.EntryID
 ORDER BY je.EntryDate DESC";
 
@@ -168,7 +173,7 @@ if ($result && $result->num_rows > 0) {
                                             <button data-modal-target="<?= $viewModalId ?>" data-modal-toggle="<?= $viewModalId ?>" class="w-full px-3 py-2 bg-blue-400 text-white rounded-md">View</button>
                                             <button data-modal-target="<?= $editModalId ?>" data-modal-toggle="<?= $editModalId ?>" class="w-full px-3 py-2 bg-green-400 text-white rounded-md">Edit</button>
                                         <?php else: ?>
-                                            <button data-modal-target="<?= $editModalId ?>" data-modal-toggle="<?= $editModalId ?>" class="w-full px-3 py-2 bg-accent text-white rounded-md">Add Audit</button>
+                                            <button data-modal-target="<?= $editModalId ?>" data-modal-toggle="<?= $editModalId ?>" data-entry-id="<?= $entry['EntryID'] ?>" class="w-full px-3 py-2 bg-accent text-white rounded-md">Add Audit</button>
                                         <?php endif; ?>
                                     </div>
                                 </td>
@@ -221,10 +226,10 @@ if ($result && $result->num_rows > 0) {
                                             <box-icon name='x'></box-icon>
                                         </button>
                                     </div>
-                                    <form action="../php/submit_financial_audit_gl.php" method="POST" class="flex flex-col gap-3">
-                                        <input type="hidden" name="EntryID" value="<?= $entry['EntryID'] ?>">
+                                    <form action="../php/submit_financial_audit_gl.php" method="POST" class="flex flex-col gap-3" data-entry-id="<?= $entry['EntryID'] ?>">
+                                        <input type="hidden" name="EntryID" value="<?= htmlspecialchars($entry['EntryID']) ?>">
                                         <?php if (isset($entry['AuditID'])): ?>
-                                            <input type="hidden" name="AuditID" value="<?= $entry['AuditID'] ?>">
+                                            <input type="hidden" name="AuditID" value="<?= htmlspecialchars($entry['AuditID']) ?>">
                                         <?php endif; ?>
                                         <div class="flex flex-col">
                                             <label>Reviewed By:
@@ -276,12 +281,82 @@ if ($result && $result->num_rows > 0) {
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Modal handling code
+            document.querySelectorAll('[data-modal-toggle]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const modalId = this.getAttribute('data-modal-target');
+                    const modal = document.getElementById(modalId);
+                    const entryId = this.getAttribute('data-entry-id');
+                    
+                    if (modal) {
+                        // If this is an Add Audit button, ensure EntryID is set in the form
+                        if (entryId) {
+                            const form = modal.querySelector('form');
+                            if (form) {
+                                form.setAttribute('data-entry-id', entryId);
+                                const entryIdInput = form.querySelector('input[name="EntryID"]');
+                                if (entryIdInput) {
+                                    entryIdInput.value = entryId;
+                                } else {
+                                    // Create EntryID input if it doesn't exist
+                                    const input = document.createElement('input');
+                                    input.type = 'hidden';
+                                    input.name = 'EntryID';
+                                    input.value = entryId;
+                                    form.appendChild(input);
+                                }
+                            }
+                        }
+                        
+                        modal.classList.remove('hidden');
+                        modal.classList.add('flex');
+                    }
+                });
+            });
+
+            // Modal hide buttons
+            document.querySelectorAll('[data-modal-hide]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const modalId = this.getAttribute('data-modal-hide');
+                    const modal = document.getElementById(modalId);
+                    if (modal) {
+                        modal.classList.add('hidden');
+                        modal.classList.remove('flex');
+                    }
+                });
+            });
+
+            // Form submission handling
             const forms = document.querySelectorAll('form[action="../php/submit_financial_audit_gl.php"]');
             forms.forEach(form => {
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();
-                    const formData = new FormData(form);
-                    fetch(form.action, {
+                    
+                    // Get EntryID from data attribute or hidden input
+                    const entryId = this.getAttribute('data-entry-id') || this.querySelector('input[name="EntryID"]')?.value;
+                    if (!entryId) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'EntryID is required.',
+                            confirmButtonColor: '#d33'
+                        });
+                        return;
+                    }
+                    
+                    const formData = new FormData(this);
+                    // Ensure EntryID is in the form data
+                    if (!formData.has('EntryID')) {
+                        formData.append('EntryID', entryId);
+                    }
+                    
+                    // Debug log form data
+                    console.log('Form Data:');
+                    for (let pair of formData.entries()) {
+                        console.log(pair[0] + ': ' + pair[1]);
+                    }
+                    
+                    fetch(this.action, {
                         method: 'POST',
                         body: formData
                     })
@@ -310,7 +385,8 @@ if ($result && $result->num_rows > 0) {
                             });
                         }
                     })
-                    .catch(() => {
+                    .catch(error => {
+                        console.error('Error:', error);
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
