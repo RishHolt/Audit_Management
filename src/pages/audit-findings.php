@@ -81,87 +81,53 @@ error_log("All Findings: " . print_r($findings, true));
 	<title>Audit Management</title>
 </head>
 <body>
-	<div id="container" class="w-full h-dvh flex flex-col">
-		<div id="header" class="w-full min-h-20 max-h-20 bg-white border-b-2 border-accent">
-			<div class="w-70 h-full flex items-center px-3 py-2 border-r-2 border-accent">
-				<img class="size-full" src="../assets/logo.svg" alt="">
-			</div>
-		</div>
-		<div class="size-full flex flex-row">
-			<div id="sidebar" class="min-w-70 px-3 py-2 h-full flex flex-col gap-3 bg-white border-r-2 border-accent">
-				<span id="header" class="text-2xl font-bold w-full h-fit text-center">Audit Management</span>
-				<a href="dashboard.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
-					<box-icon name='dashboard' type='solid' color='#4E3B2A'></box-icon>
-					<span>Dashboard</span>
-				</a>
-				<a href="audit-plan.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
-					<box-icon name='calendar-check' type='solid' color='#4E3B2A'></box-icon>
-					<span>Audit Plan</span>
-				</a>
-				<a href="audit-conduct.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
-					<box-icon name='file-doc' type='solid' color='#4E3B2A'></box-icon>
-					<span>Conduct Audit</span>
-				</a>
-				<a href="financial-audit-gl.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-white text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
-                    <box-icon name='dollar-circle' type='solid' color='#4E3B2A'></box-icon>
-                    <span>Financial Audit (GL)</span>
-                </a>
-				<a href="audit-findings.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-white text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
-					<box-icon name='search-alt-2' type='solid' color='#4E3B2A'></box-icon>
-					<span>Findings</span>
-				</a>
-				<a href="audit-actions.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
-					<box-icon name='check-square' type='solid' color='#4E3B2A'></box-icon>
-					<span>Corrective Actions</span>
-				</a>
-				<a href="audit-logs.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
-					<box-icon name='time-five' type='solid' color='#4E3B2A'></box-icon>
-					<span>Audit Logs</span>
-				</a>
-			</div>
-			<div id="main" class="size-full flex flex-col gap-3 p-6 bg-primary">
-				<span id="header" class="text-2xl font-bold text-[#4E3B2A]">Findings</span>
+    <div id="container" class="flex flex-col w-full h-dvh">
+        <?php include '../components/topbar.php'; ?>
+        <div class="flex flex-row size-full">
+            <?php include '../components/sidebar.php'; ?>
+			<div id="main" class="flex flex-col gap-3 bg-primary p-6 size-full">
+				<span id="header" class="font-bold text-[#4E3B2A] text-2xl">Findings</span>
 				<!-- Log Finding Button -->
 				<button data-modal-target="finding-modal" data-modal-toggle="finding-modal" class="flex size-fit">
-					<span class="px-3 py-2 size-fit bg-accent rounded-md">Log Finding</span>
+					<span class="bg-accent px-3 py-2 rounded-md size-fit">Log Finding</span>
 				</button>
 
 				<!-- Findings Table -->
 				<table class="w-full border-collapse table-auto">
 					<thead>
 						<tr class="bg-secondary text-white">
-							<th class="px-4 py-2 whitespace-nowrap w-[8%]">
-								<div class="flex items-center justify-start gap-2">
+							<th class="px-4 py-2 w-[8%] whitespace-nowrap">
+								<div class="flex justify-start items-center gap-2">
 									<box-icon name='hash' color='white'></box-icon>
 									Finding ID
 								</div>
 							</th>
-							<th class="px-4 py-2 whitespace-nowrap w-[8%]">
-								<div class="flex items-center justify-start gap-2">
+							<th class="px-4 py-2 w-[8%] whitespace-nowrap">
+								<div class="flex justify-start items-center gap-2">
 									<box-icon name='file' color='white'></box-icon>
 									Audit ID
 								</div>
 							</th>
-							<th class="px-4 py-2 whitespace-nowrap w-[35%]">
-								<div class="flex items-center justify-start gap-2">
+							<th class="px-4 py-2 w-[35%] whitespace-nowrap">
+								<div class="flex justify-start items-center gap-2">
 									<box-icon name='text' color='white'></box-icon>
 									Description
 								</div>
 							</th>
-							<th class="px-4 py-2 whitespace-nowrap w-[15%]">
-								<div class="flex items-center justify-start gap-2">
+							<th class="px-4 py-2 w-[15%] whitespace-nowrap">
+								<div class="flex justify-start items-center gap-2">
 									<box-icon name='tag' color='white'></box-icon>
 									Category
 								</div>
 							</th>
-							<th class="px-4 py-2 whitespace-nowrap w-[19%]">
-								<div class="flex items-center justify-start gap-2">
+							<th class="px-4 py-2 w-[19%] whitespace-nowrap">
+								<div class="flex justify-start items-center gap-2">
 									<box-icon name='time' color='white'></box-icon>
 									Logged At
 								</div>
 							</th>
-							<th class="px-4 py-2 whitespace-nowrap w-[15%]">
-								<div class="flex items-center justify-start gap-2">
+							<th class="px-4 py-2 w-[15%] whitespace-nowrap">
+								<div class="flex justify-start items-center gap-2">
 									<box-icon name='cog' color='white'></box-icon>
 									Actions
 								</div>
@@ -174,10 +140,10 @@ error_log("All Findings: " . print_r($findings, true));
 								$editModalId = "edit-finding-modal-" . $finding['FindingID'];
 								$viewModalId = "view-finding-modal-" . $finding['FindingID'];
 							?>
-								<tr class="border-b-1 border-accent bg-white hover:bg-primary transition-colors duration-200">
+								<tr class="bg-white hover:bg-primary border-accent border-b-1 transition-colors duration-200">
 									<td class="px-4 py-2 whitespace-nowrap"><?= htmlspecialchars($finding['FindingID']) ?></td>
 									<td class="px-4 py-2 whitespace-nowrap"><?= htmlspecialchars($finding['AuditID']) ?></td>
-									<td class="px-4 py-2 truncate max-w-0"><?= htmlspecialchars($finding['Description']) ?></td>
+									<td class="px-4 py-2 max-w-0 truncate"><?= htmlspecialchars($finding['Description']) ?></td>
 									<td class="px-4 py-2 whitespace-nowrap">
 										<span class="px-2 py-1 rounded-full text-sm <?= 
 											$finding['Category'] === 'Compliant' ? 'bg-green-100 text-green-800' : 
@@ -189,17 +155,17 @@ error_log("All Findings: " . print_r($findings, true));
 									<td class="px-4 py-2 whitespace-nowrap"><?= htmlspecialchars($finding['LoggedAt']) ?></td>
 									<td class="px-4 py-2">
 										<div class="flex gap-1">
-											<button data-modal-target="<?= $viewModalId ?>" data-modal-toggle="<?= $viewModalId ?>" class="w-full px-3 py-2 bg-blue-400 text-white rounded-md">View</button>
-											<button onclick="handleDelete(<?= $finding['FindingID'] ?>)" class="w-full px-3 py-2 bg-red-400 text-white rounded-md">Delete</button>
+											<button data-modal-target="<?= $viewModalId ?>" data-modal-toggle="<?= $viewModalId ?>" class="bg-blue-400 px-3 py-2 rounded-md w-full text-white">View</button>
+											<button onclick="handleDelete(<?= $finding['FindingID'] ?>)" class="bg-red-400 px-3 py-2 rounded-md w-full text-white">Delete</button>
 										</div>
 									</td>
 								</tr>
 								<!-- Edit Modal for this finding -->
-								<div id="<?= $editModalId ?>" data-modal-backdrop="static" tabindex="-1" aria-hidden="true" class="hidden fixed top-0 left-0 size-full z-50 items-center justify-center">
-									<div class="flex flex-col w-full max-w-md p-4 bg-white shadow-md rounded-md">
+								<div id="<?= $editModalId ?>" data-modal-backdrop="static" tabindex="-1" aria-hidden="true" class="hidden top-0 left-0 z-50 fixed justify-center items-center size-full">
+									<div class="flex flex-col bg-white shadow-md p-4 rounded-md w-full max-w-md">
 										<div class="flex justify-between items-center mb-4">
-											<span id="header" class="text-xl font-bold text-[#4E3B2A]">Edit Finding</span>
-																						<button data-modal-hide="<?= $editModalId ?>" class="text-gray-400 bg-transparent hover:bg-primary transition-colors duration-200 rounded-lg text-sm w-8 h-8 flex justify-center items-center">
+											<span id="header" class="font-bold text-[#4E3B2A] text-xl">Edit Finding</span>
+																						<button data-modal-hide="<?= $editModalId ?>" class="flex justify-center items-center bg-transparent hover:bg-primary rounded-lg w-8 h-8 text-gray-400 text-sm transition-colors duration-200">
 												<box-icon name='x'></box-icon>
 											</button>
 										</div>
@@ -208,7 +174,7 @@ error_log("All Findings: " . print_r($findings, true));
 											<input type="hidden" name="FindingID" value="<?= htmlspecialchars($finding['FindingID']) ?>">
 											<div class="flex flex-col">
 												<label for="Category-<?= $finding['FindingID'] ?>" class="mb-1">Category:</label>
-												<select name="Category" id="Category-<?= $finding['FindingID'] ?>" required class="w-full px-3 py-2 border rounded-lg bg-white focus:ring-2 focus:ring-accent focus:border-accent">
+												<select name="Category" id="Category-<?= $finding['FindingID'] ?>" required class="bg-white px-3 py-2 border focus:border-accent rounded-lg focus:ring-2 focus:ring-accent w-full">
 													<option value="Compliant" <?= $finding['Category'] == 'Compliant' ? 'selected' : '' ?>>Compliant</option>
 													<option value="Non-Compliant" <?= $finding['Category'] == 'Non-Compliant' ? 'selected' : '' ?>>Non-Compliant</option>
 													<option value="Observation" <?= $finding['Category'] == 'Observation' ? 'selected' : '' ?>>Observation</option>
@@ -216,26 +182,26 @@ error_log("All Findings: " . print_r($findings, true));
 											</div>
 											<div class="flex flex-col">
 												<label for="Description-<?= $finding['FindingID'] ?>" class="mb-1">Description:</label>
-												<textarea name="Description" id="Description-<?= $finding['FindingID'] ?>" required class="w-full px-3 py-2 border rounded-lg bg-white focus:ring-2 focus:ring-accent focus:border-accent min-h-[100px]"><?= htmlspecialchars($finding['Description']) ?></textarea>
+												<textarea name="Description" id="Description-<?= $finding['FindingID'] ?>" required class="bg-white px-3 py-2 border focus:border-accent rounded-lg focus:ring-2 focus:ring-accent w-full min-h-[100px]"><?= htmlspecialchars($finding['Description']) ?></textarea>
 											</div>
 											                                        <div class="flex justify-end gap-2 mt-4">
-                                            <button type="submit" class="px-4 py-2 bg-secondary text-white rounded-md hover:bg-opacity-90">Save Changes</button>
-                                            <button type="button" data-modal-hide="<?= $editModalId ?>" class="px-4 py-2 bg-gray-400 text-white rounded-md hover:bg-opacity-90">Cancel</button>
+                                            <button type="submit" class="bg-secondary hover:bg-opacity-90 px-4 py-2 rounded-md text-white">Save Changes</button>
+                                            <button type="button" data-modal-hide="<?= $editModalId ?>" class="bg-gray-400 hover:bg-opacity-90 px-4 py-2 rounded-md text-white">Cancel</button>
                                         </div>
 										</form>
 									</div>
 								</div>
 								<!-- View Modal for this finding -->
-								<div id="<?= $viewModalId ?>" data-modal-backdrop="static" tabindex="-1" aria-hidden="true" class="hidden fixed top-0 left-0 size-full z-50 items-center justify-center">
-									<div class="flex flex-col w-full max-w-md p-4 bg-white shadow-md rounded-md">
+								<div id="<?= $viewModalId ?>" data-modal-backdrop="static" tabindex="-1" aria-hidden="true" class="hidden top-0 left-0 z-50 fixed justify-center items-center size-full">
+									<div class="flex flex-col bg-white shadow-md p-4 rounded-md w-full max-w-md">
 										<div class="flex justify-between items-center mb-4">
-											<span id="header" class="text-xl font-bold text-[#4E3B2A]">View Finding</span>
-											<button data-modal-hide="<?= $viewModalId ?>" class="text-gray-400 bg-transparent hover:bg-primary transition-colors duration-200 rounded-lg text-sm w-8 h-8 flex justify-center items-center">
+											<span id="header" class="font-bold text-[#4E3B2A] text-xl">View Finding</span>
+											<button data-modal-hide="<?= $viewModalId ?>" class="flex justify-center items-center bg-transparent hover:bg-primary rounded-lg w-8 h-8 text-gray-400 text-sm transition-colors duration-200">
 												<box-icon name='x'></box-icon>
 											</button>
 										</div>
 										<!-- Show finding details as text -->
-										<div class="flex flex-col gap-2 mb-4 p-3 bg-gray-50 rounded-md">
+										<div class="flex flex-col gap-2 bg-gray-50 mb-4 p-3 rounded-md">
 											<div><strong>Status:</strong> 
 												<span class="px-2 py-1 rounded-full text-sm <?= 
 													$finding['Category'] === 'Compliant' ? 'bg-green-100 text-green-800' : 
@@ -256,9 +222,9 @@ error_log("All Findings: " . print_r($findings, true));
 													error_log("View Modal Finding Actions: " . print_r($finding['actions'], true)); // Debug log
 													if (!empty($finding['actions']) && is_array($finding['actions']) && count($finding['actions']) > 0): 
 												?>
-													<div class="mt-2 space-y-2">
+													<div class="space-y-2 mt-2">
 														<?php foreach ($finding['actions'] as $action): ?>
-															<div class="p-2 bg-white rounded border border-accent">
+															<div class="bg-white p-2 border border-accent rounded">
 																<div><strong>Status:</strong> 
 																	<span class="px-2 py-1 rounded-full text-sm <?= 
 																		$action['Status'] === 'Completed' ? 'bg-green-100 text-green-800' : 
@@ -280,30 +246,30 @@ error_log("All Findings: " . print_r($findings, true));
 											</div>
 										</div>
 										<div class="flex justify-end gap-2 mt-4">
-											<button type="button" data-modal-hide="<?= $viewModalId ?>" data-modal-target="<?= $editModalId ?>" data-modal-toggle="<?= $editModalId ?>" class="bg-green-600 text-white px-4 py-2 rounded-md">Edit</button>
+											<button type="button" data-modal-hide="<?= $viewModalId ?>" data-modal-target="<?= $editModalId ?>" data-modal-toggle="<?= $editModalId ?>" class="bg-green-600 px-4 py-2 rounded-md text-white">Edit</button>
 										</div>
 									</div>
 								</div>
 							<?php endforeach; ?>
 						<?php else: ?>
-							<tr><td colspan="6" class="text-center text-[#4E3B2A]">No findings logged.</td></tr>
+							<tr><td colspan="6" class="text-[#4E3B2A] text-center">No findings logged.</td></tr>
 						<?php endif; ?>
 					</tbody>
 				</table>
 
 				<!-- Log Finding Modal -->
-				<div id="finding-modal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true" class="hidden fixed top-0 left-0 size-full z-50 items-center justify-center">
-					<div class="flex flex-col w-full max-w-md p-4 bg-white shadow-md rounded-md">
+				<div id="finding-modal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true" class="hidden top-0 left-0 z-50 fixed justify-center items-center size-full">
+					<div class="flex flex-col bg-white shadow-md p-4 rounded-md w-full max-w-md">
 						<div class="flex justify-between items-center mb-4">
-							<span id="header" class="text-xl font-bold text-[#4E3B2A]">Log Finding</span>
-							<button data-modal-hide="finding-modal" class="text-gray-400 bg-transparent hover:bg-primary transition-colors duration-200 rounded-lg text-sm w-8 h-8 flex justify-center items-center">
+							<span id="header" class="font-bold text-[#4E3B2A] text-xl">Log Finding</span>
+							<button data-modal-hide="finding-modal" class="flex justify-center items-center bg-transparent hover:bg-primary rounded-lg w-8 h-8 text-gray-400 text-sm transition-colors duration-200">
 								<box-icon name='x'></box-icon>
 							</button>
 						</div>
 						<form onsubmit="handleSubmit(event)" action="../php/findings-submit.php" method="post" class="flex flex-col gap-3">
 							<div class="flex flex-col">
 								<label for="AuditID" class="mb-1">Select Audit:</label>
-								<select name="AuditID" id="AuditID" required class="w-full px-3 py-2 border rounded-lg bg-white focus:ring-2 focus:ring-accent focus:border-accent">
+								<select name="AuditID" id="AuditID" required class="bg-white px-3 py-2 border focus:border-accent rounded-lg focus:ring-2 focus:ring-accent w-full">
 									<option value="">Select an audit...</option>
 									<?php foreach ($audits as $audit): ?>
 										<option value="<?= htmlspecialchars($audit['AuditID']) ?>">
@@ -316,7 +282,7 @@ error_log("All Findings: " . print_r($findings, true));
 							</div>
 							<div class="flex flex-col">
 								<label for="Category" class="mb-1">Select Category:</label>
-								<select name="Category" id="Category" required class="w-full px-3 py-2 border rounded-lg bg-white focus:ring-2 focus:ring-accent focus:border-accent">
+								<select name="Category" id="Category" required class="bg-white px-3 py-2 border focus:border-accent rounded-lg focus:ring-2 focus:ring-accent w-full">
 									<option value="">Select a category...</option>
 									<option value="Compliant">Compliant</option>
 									<option value="Non-Compliant">Non-Compliant</option>
@@ -325,11 +291,11 @@ error_log("All Findings: " . print_r($findings, true));
 							</div>
 							<div class="flex flex-col">
 								<label for="Description" class="mb-1">Description:</label>
-								<textarea name="Description" id="Description" required placeholder="Enter finding description..." class="w-full px-3 py-2 border rounded-lg bg-white focus:ring-2 focus:ring-accent focus:border-accent min-h-[100px]"></textarea>
+								<textarea name="Description" id="Description" required placeholder="Enter finding description..." class="bg-white px-3 py-2 border focus:border-accent rounded-lg focus:ring-2 focus:ring-accent w-full min-h-[100px]"></textarea>
 							</div>
 							<div class="flex justify-end gap-2 mt-2">
-								<button type="submit" class="px-4 py-2 bg-secondary text-white rounded-md hover:bg-opacity-90">Log Finding</button>
-								<button type="button" data-modal-hide="finding-modal" class="px-4 py-2 bg-gray-400 text-white rounded-md hover:bg-opacity-90">Cancel</button>
+								<button type="submit" class="bg-secondary hover:bg-opacity-90 px-4 py-2 rounded-md text-white">Log Finding</button>
+								<button type="button" data-modal-hide="finding-modal" class="bg-gray-400 hover:bg-opacity-90 px-4 py-2 rounded-md text-white">Cancel</button>
 							</div>
 						</form>
 					</div>

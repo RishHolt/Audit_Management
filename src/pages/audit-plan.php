@@ -17,85 +17,51 @@ include '../php/conn.php';
 	<title>Audit Management</title>
 </head>
 <body>
-	<div id="container" class="w-full h-dvh flex flex-col">
-		<div id="header" class="w-full min-h-20 max-h-20 bg-white border-b-2 border-accent">
-			<div class="w-70 h-full flex items-center px-3 py-2 border-r-2 border-accent">
-				<img class="size-full" src="../assets/logo.svg" alt="">
-			</div>
-		</div>
-		<div class="size-full flex flex-row">
-			<div id="sidebar" class="min-w-70 px-3 py-2 h-full flex flex-col gap-3 bg-white border-r-2 border-accent">
-				<span id="header" class="text-2xl font-bold w-full h-fit text-center text-[#4E3B2A]">Audit Management</span>
-				<a href="dashboard.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
-					<box-icon name='dashboard' type='solid' color='#4E3B2A'></box-icon>
-					<span>Dashboard</span>
-				</a>
-				<a href="audit-plan.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-white text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
-					<box-icon name='calendar-check' type='solid' color='#4E3B2A'></box-icon>
-					<span>Audit Plan</span>
-				</a>
-				<a href="audit-conduct.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
-					<box-icon name='file-doc' type='solid' color='#4E3B2A'></box-icon>
-					<span>Conduct Audit</span>
-				</a>
-				<a href="financial-audit-gl.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-white text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
-                    <box-icon name='dollar-circle' type='solid' color='#4E3B2A'></box-icon>
-                    <span>Financial Audit (GL)</span>
-                </a>
-				<a href="audit-findings.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
-					<box-icon name='search-alt-2' type='solid' color='#4E3B2A'></box-icon>
-					<span>Findings</span>
-				</a>
-				<a href="audit-actions.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
-					<box-icon name='check-square' type='solid' color='#4E3B2A'></box-icon>
-					<span>Corrective Actions</span>
-				</a>
-				<a href="audit-logs.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
-					<box-icon name='time-five' type='solid' color='#4E3B2A'></box-icon>
-					<span>Audit Logs</span>
-				</a>
-			</div>
-			<div id="main" class="size-full flex flex-col gap-3 p-6 bg-primary">
-				<span id="header" class="text-2xl font-bold text-[#4E3B2A]">Audit Plan</span>
+    <div id="container" class="flex flex-col w-full h-dvh">
+        <?php include '../components/topbar.php'; ?>
+        <div class="flex flex-row size-full">
+            <?php include '../components/sidebar.php'; ?>
+			<div id="main" class="flex flex-col gap-3 bg-primary p-6 size-full">
+				<span id="header" class="font-bold text-[#4E3B2A] text-2xl">Audit Plan</span>
 				<!-- modal button -->
 				<button data-modal-target="plan-modal" data-modal-toggle="plan-modal" class="flex size-fit">
-					<span class="px-3 py-2 size-fit bg-accent rounded-md">New Plan</span>
+					<span class="bg-accent px-3 py-2 rounded-md size-fit">New Plan</span>
 				</button>
 				<table class="w-full border-collapse table-auto">
 					<thead>
 						<tr class="bg-secondary text-white">
-							<th class="px-4 py-2 whitespace-nowrap w-[10%]">
-								<div class="flex items-center justify-start gap-2">
+							<th class="px-4 py-2 w-[10%] whitespace-nowrap">
+								<div class="flex justify-start items-center gap-2">
 									<box-icon name='hash' color='white'></box-icon>
 									Plan ID
 								</div>
 							</th>
-							<th class="px-4 py-2 whitespace-nowrap w-[25%]">
-								<div class="flex items-center justify-start gap-2">
+							<th class="px-4 py-2 w-[25%] whitespace-nowrap">
+								<div class="flex justify-start items-center gap-2">
 									<box-icon name='text' color='white'></box-icon>
 									Title
 								</div>
 							</th>
-							<th class="px-4 py-2 whitespace-nowrap w-[20%]">
-								<div class="flex items-center justify-start gap-2">
+							<th class="px-4 py-2 w-[20%] whitespace-nowrap">
+								<div class="flex justify-start items-center gap-2">
 									<box-icon name='building' color='white'></box-icon>
 									Department
 								</div>
 							</th>
-							<th class="px-4 py-2 whitespace-nowrap w-[15%]">
-								<div class="flex items-center justify-start gap-2">
+							<th class="px-4 py-2 w-[15%] whitespace-nowrap">
+								<div class="flex justify-start items-center gap-2">
 									<box-icon name='calendar' color='white'></box-icon>
 									Planned Date
 								</div>
 							</th>
-							<th class="px-4 py-2 whitespace-nowrap w-[15%]">
-								<div class="flex items-center justify-start gap-2">
+							<th class="px-4 py-2 w-[15%] whitespace-nowrap">
+								<div class="flex justify-start items-center gap-2">
 									<box-icon name='info-circle' color='white'></box-icon>
 									Status
 								</div>
 							</th>
-							<th class="px-4 py-2 whitespace-nowrap w-[15%]">
-								<div class="flex items-center justify-start gap-2">
+							<th class="px-4 py-2 w-[15%] whitespace-nowrap">
+								<div class="flex justify-start items-center gap-2">
 									<box-icon name='cog' color='white'></box-icon>
 									Actions
 								</div>
@@ -122,11 +88,11 @@ include '../php/conn.php';
 								if (!empty($row['AuditID'])) {
 									$findingsResult = $conn->query("SELECT FindingID, Category, Description, LoggedAt FROM findings WHERE AuditID = " . intval($row['AuditID']));
 									if ($findingsResult && $findingsResult->num_rows > 0) {
-										$findingsHtml .= "<div class='mt-4'><strong>Findings:</strong><ul class='list-disc pl-5'>";
+										$findingsHtml .= "<div class='mt-4'><strong>Findings:</strong><ul class='pl-5 list-disc'>";
 										while ($finding = $findingsResult->fetch_assoc()) {
 											$findingsHtml .= "<li><span class='font-semibold'>" . htmlspecialchars($finding['Category']) . ":</span> " . 
 														   htmlspecialchars($finding['Description']) . 
-														   " <span class='text-xs text-gray-500'>(" . htmlspecialchars($finding['LoggedAt']) . ")</span></li>";
+														   " <span class='text-gray-500 text-xs'>(" . htmlspecialchars($finding['LoggedAt']) . ")</span></li>";
 										}
 										$findingsHtml .= "</ul></div>";
 									} else {
@@ -134,14 +100,13 @@ include '../php/conn.php';
 									}
 								}
 
-								echo "<tr class='border-b-1 border-accent bg-white hover:bg-primary transition-colors duration-200'>";
+								echo "<tr class='bg-white hover:bg-primary border-accent border-b-1 transition-colors duration-200'>";
 								echo "<td class='px-4 py-2 whitespace-nowrap'>" . htmlspecialchars($row["PlanID"]) . "</td>";
 								echo "<td class='px-4 py-2 whitespace-nowrap'>" . htmlspecialchars($row["Title"]) . "</td>";
 								echo "<td class='px-4 py-2 whitespace-nowrap'>" . htmlspecialchars($row["Department"]) . "</td>";
 								echo "<td class='px-4 py-2 whitespace-nowrap'>" . htmlspecialchars($row["ScheduledDate"]) . "</td>";
 								echo "<td class='px-4 py-2'>
-									<span class='px-2 py-1 rounded-full text-sm " . 
-									($row["Status"] === 'Completed' ? 'bg-green-100 text-green-800' : 
+									<span class='px-2 py-1 rounded-full text-sm " . ($row["Status"] ==='Completed' ? 'bg-green-100 text-green-800' : 
 									($row["Status"] === 'Under Review' ? 'bg-yellow-100 text-yellow-800' : 
 									($row["Status"] === 'Cancelled' ? 'bg-red-100 text-red-800' : 
 									'bg-gray-100 text-gray-800'))) . "'>
@@ -149,26 +114,25 @@ include '../php/conn.php';
 									</span>
 								</td>";
 								echo "<td class='px-4 py-2'><div class='flex gap-1'>
-									<button data-modal-target='$viewModalId' data-modal-toggle='$viewModalId' class='flex justify-center items-center w-full px-3 py-2 bg-blue-400 text-white rounded-md'>View</button>
-									<button onclick='handleDelete(\"$deleteId\")' class='text-center w-full px-3 py-2 bg-red-400 text-white rounded-md'>Delete</button>
+									<button data-modal-target='$viewModalId' data-modal-toggle='$viewModalId' class='flex justify-center items-center bg-blue-400 px-3 py-2 rounded-md w-full text-white'>View</button>
+									<button onclick='handleDelete(\"$deleteId\")' class='bg-red-400 px-3 py-2 rounded-md w-full text-white text-center'>Delete</button>
 								</div></td>";
 								echo "</tr>";
 
 								// View Modal (read-only)
 								$modals[] = "
-								<div id='$viewModalId' data-modal-backdrop='static' tabindex='-1' aria-hidden='true' class='hidden fixed top-0 left-0 size-full z-50 items-center justify-center'>
-									<div class='flex flex-col w-full max-w-md h-[85vh] bg-white shadow-md rounded-md'>
+								<div id='$viewModalId' data-modal-backdrop='static' tabindex='-1' aria-hidden='true' class='hidden top-0 left-0 z-50 fixed justify-center items-center size-full'>
+									<div class='flex flex-col bg-white shadow-md rounded-md w-full max-w-md h-[85vh]'>
 										<div class='flex justify-between items-center p-4'>
-											<span id='header' class='text-xl font-bold text-[#4E3B2A]'>View Audit Plan</span>
-											<button data-modal-hide='$viewModalId' class='text-gray-400 bg-transparent hover:bg-primary transition-colors duration-200 rounded-lg text-sm w-8 h-8 flex justify-center items-center'>
+											<span id='header' class='font-bold text-[#4E3B2A] text-xl'>View Audit Plan</span>
+											<button data-modal-hide='$viewModalId' class='flex justify-center items-center bg-transparent hover:bg-primary rounded-lg w-8 h-8 text-gray-400 text-sm transition-colors duration-200'>
 												<box-icon name='x'></box-icon>
 											</button>
 										</div>
-										<div class='flex-1 overflow-y-auto p-4' style='max-height: calc(85vh - 8rem);'>
-											<div class='flex flex-col gap-2 mb-4 p-3 bg-gray-50 rounded-md'>
+										<div class='flex-1 p-4 overflow-y-auto' style='max-height: calc(85vh - 8rem);'>
+											<div class='flex flex-col gap-2 bg-gray-50 mb-4 p-3 rounded-md'>
 												<div><strong>Status:</strong> 
-													<span class='px-2 py-1 rounded-full text-sm " . 
-													($row["Status"] === 'Completed' ? 'bg-green-100 text-green-800' : 
+													<span class='px-2 py-1 rounded-full text-sm " . ($row["Status"] ==='Completed' ? 'bg-green-100 text-green-800' : 
 													($row["Status"] === 'Under Review' ? 'bg-yellow-100 text-yellow-800' : 
 													($row["Status"] === 'Cancelled' ? 'bg-red-100 text-red-800' : 
 													'bg-gray-100 text-gray-800'))) . "'>
@@ -189,13 +153,12 @@ include '../php/conn.php';
 												<strong class='text-[#4E3B2A]'>Audit</strong>";
 											
 											if ($auditResult && $auditResult->num_rows > 0) {
-												$modals[] = "<div class='mt-2 space-y-2'>";
+												$modals[] = "<div class='space-y-2 mt-2'>";
 												while ($audit = $auditResult->fetch_assoc()) {
 													$modals[] = "
-														<div class='p-3 bg-white rounded border border-accent'>
+														<div class='bg-white p-3 border border-accent rounded'>
 															<div class='mb-1'><strong>Status:</strong> 
-																<span class='px-2 py-1 rounded-full text-sm " . 
-																($audit['Status'] === 'Completed' ? 'bg-green-100 text-green-800' : 
+																<span class='px-2 py-1 rounded-full text-sm " . ($audit['Status'] === 'Completed' ? 'bg-green-100 text-green-800' : 
 																($audit['Status'] === 'Under Review' ? 'bg-yellow-100 text-yellow-800' : 
 																'bg-blue-100 text-blue-800')) . "'>
 																" . htmlspecialchars($audit['Status']) . "
@@ -219,20 +182,19 @@ include '../php/conn.php';
 													<strong class='text-[#4E3B2A]'>Findings</strong>";
 												
 												if ($findingsResult && $findingsResult->num_rows > 0) {
-													$modals[] = "<div class='mt-2 space-y-2'>";
+													$modals[] = "<div class='space-y-2 mt-2'>";
 													while ($finding = $findingsResult->fetch_assoc()) {
 														$modals[] = "
-															<div class='p-3 bg-white rounded border border-accent'>
+															<div class='bg-white p-3 border border-accent rounded'>
 																                                                <div class='mb-1'><strong>Status:</strong> 
-                                                    <span class='px-2 py-1 rounded-full text-sm " . 
-                                                    ($finding['Category'] === 'Compliant' ? 'bg-green-100 text-green-800' : 
+                                                    <span class='px-2 py-1 rounded-full text-sm " . ($finding['Category'] === 'Compliant' ? 'bg-green-100 text-green-800' : 
                                                     ($finding['Category'] === 'Non-Compliant' ? 'bg-red-100 text-red-800' : 
                                                     'bg-yellow-100 text-yellow-800')) . "'>
                                                     " . htmlspecialchars($finding['Category']) . "
                                                     </span>
                                                 </div>
                                                 <div class='mb-1'><strong>Description:</strong> " . htmlspecialchars($finding['Description']) . "</div>
-                                                <div><strong>Logged At:</strong> <span class='text-sm text-gray-600'>" . htmlspecialchars($finding['LoggedAt']) . "</span></div>
+                                                <div><strong>Logged At:</strong> <span class='text-gray-600 text-sm'>" . htmlspecialchars($finding['LoggedAt']) . "</span></div>
 															</div>";
 													}
 													$modals[] = "</div>";
@@ -248,7 +210,7 @@ include '../php/conn.php';
 												$findingsResult->data_seek(0);
 												$hasActions = false;
 												if ($findingsResult && $findingsResult->num_rows > 0) {
-													$modals[] = "<div class='mt-2 space-y-2'>";
+													$modals[] = "<div class='space-y-2 mt-2'>";
 													while ($finding = $findingsResult->fetch_assoc()) {
 														$actionsResult = $conn->query("SELECT ActionID, AssignedTo, Task, DueDate, Status FROM correctiveactions WHERE FindingID = " . intval($finding['FindingID']));
 														
@@ -256,10 +218,9 @@ include '../php/conn.php';
 															$hasActions = true;
 															while ($action = $actionsResult->fetch_assoc()) {
 																$modals[] = "
-																	<div class='p-3 bg-white rounded border border-accent'>
+																	<div class='bg-white p-3 border border-accent rounded'>
 																		<div class='mb-1'><strong>Status:</strong> 
-																			<span class='px-2 py-1 rounded-full text-sm " . 
-																			($action['Status'] === 'Completed' ? 'bg-green-100 text-green-800' : 
+																			<span class='px-2 py-1 rounded-full text-sm " . ($action['Status'] === 'Completed' ? 'bg-green-100 text-green-800' : 
 																			($action['Status'] === 'Failed' ? 'bg-red-100 text-red-800' : 
 																			($action['Status'] === 'Under Review' ? 'bg-yellow-100 text-yellow-800' : 
 																			'bg-blue-100 text-blue-800'))) . "'>
@@ -293,19 +254,19 @@ include '../php/conn.php';
 
 											$modals[] = "
 										</div>
-										<div class='flex justify-end gap-2 mt-4 p-4 border-t border-gray-200'>
-											" . ($row['Status'] !== 'Completed' && $row['Status'] !== 'Cancelled' ? "<button type='button' data-modal-hide='$viewModalId' data-modal-target='$editModalId' data-modal-toggle='$editModalId' class='bg-green-600 text-white px-4 py-2 rounded-md'>Edit</button>" : "") . "
+										<div class='flex justify-end gap-2 mt-4 p-4 border-gray-200 border-t'>
+											" . ($row['Status'] !== 'Completed' && $row['Status'] !== 'Cancelled' ? "<button type='button' data-modal-hide='$viewModalId' data-modal-target='$editModalId' data-modal-toggle='$editModalId' class='bg-green-600 px-4 py-2 rounded-md text-white'>Edit</button>" : "") . "
 										</div>
 									</div>
 								</div>";
 
 								// Edit Modal (form)
 								$modals[] = "
-								<div id='$editModalId' data-modal-backdrop='static' tabindex='-1' aria-hidden='true' class='hidden fixed top-0 left-0 size-full z-50 items-center justify-center'>
-									<div class='flex flex-col w-full max-w-md p-4 bg-white shadow-md rounded-md'>
+								<div id='$editModalId' data-modal-backdrop='static' tabindex='-1' aria-hidden='true' class='hidden top-0 left-0 z-50 fixed justify-center items-center size-full'>
+									<div class='flex flex-col bg-white shadow-md p-4 rounded-md w-full max-w-md'>
 										<div class='flex justify-between items-center mb-4'>
-											<span id='header' class='text-xl font-bold text-[#4E3B2A]'>Audit Plan</span>
-											<button data-modal-hide='$editModalId' class='text-gray-400 bg-transparent hover:bg-primary transition-colors duration-200 rounded-lg text-sm w-8 h-8 flex justify-center items-center'>
+											<span id='header' class='font-bold text-[#4E3B2A] text-xl'>Audit Plan</span>
+											<button data-modal-hide='$editModalId' class='flex justify-center items-center bg-transparent hover:bg-primary rounded-lg w-8 h-8 text-gray-400 text-sm transition-colors duration-200'>
 												<box-icon name='x'></box-icon>
 											</button>
 										</div>
@@ -315,23 +276,23 @@ include '../php/conn.php';
 											<div class='flex flex-row gap-3'>
 												<div class='flex flex-col'>
 													<label>Title:
-														<input type='text' name='Title' value='" . htmlspecialchars($row["Title"]) . "' class='px-3 py-2 border rounded-lg bg-white focus:ring-2 focus:ring-accent focus:border-accent w-full'>
+														<input type='text' name='Title' value='" . htmlspecialchars($row["Title"]) . "' class='bg-white px-3 py-2 border focus:border-accent rounded-lg focus:ring-2 focus:ring-accent w-full'>
 													</label>
 												</div>
 												<div class='flex flex-col'>
 													<label>Department:
-														<input type='text' name='Department' value='" . htmlspecialchars($row["Department"]) . "' class='px-3 py-2 border rounded-lg bg-white focus:ring-2 focus:ring-accent focus:border-accent w-full'>
+														<input type='text' name='Department' value='" . htmlspecialchars($row["Department"]) . "' class='bg-white px-3 py-2 border focus:border-accent rounded-lg focus:ring-2 focus:ring-accent w-full'>
 													</label>
 												</div>
 											</div>
 											<div class='flex flex-col'>
 												<label>Scheduled Date:
-													<input type='date' name='ScheduledDate' value='" . htmlspecialchars($row["ScheduledDate"]) . "' class='px-3 py-2 border rounded-lg bg-white focus:ring-2 focus:ring-accent focus:border-accent w-full'>
+													<input type='date' name='ScheduledDate' value='" . htmlspecialchars($row["ScheduledDate"]) . "' class='bg-white px-3 py-2 border focus:border-accent rounded-lg focus:ring-2 focus:ring-accent w-full'>
 												</label>
 											</div>
 											<div class='flex flex-col'>
 												<label>Status:
-													<select name='Status' class='px-3 py-2 border rounded-lg bg-white focus:ring-2 focus:ring-accent focus:border-accent w-full'>
+													<select name='Status' class='bg-white px-3 py-2 border focus:border-accent rounded-lg focus:ring-2 focus:ring-accent w-full'>
 														<option value='Scheduled' " . ($row["Status"] == 'Scheduled' ? 'selected' : '') . ">Scheduled</option>
 														<option value='Open' " . ($row["Status"] == 'Open' ? 'selected' : '') . ">Open</option>
 														<option value='Under Review' " . ($row["Status"] == 'Under Review' ? 'selected' : '') . ">Under Review</option>
@@ -342,11 +303,11 @@ include '../php/conn.php';
 											</div>
 											<div class='flex flex-col'>
 												<label>Description:
-													<textarea name='Description' class='w-full border p-2 rounded'>" . htmlspecialchars($row["Description"]) . "</textarea>
+													<textarea name='Description' class='p-2 border rounded w-full'>" . htmlspecialchars($row["Description"]) . "</textarea>
 												</label>
 											</div>
 											<div class='flex justify-end gap-2 mt-2'>
-												<button type='button' onclick='handleEdit(this.form)' class='bg-green-600 text-white px-4 py-2 rounded-md'>Save</button>
+												<button type='button' onclick='handleEdit(this.form)' class='bg-green-600 px-4 py-2 rounded-md text-white'>Save</button>
 											</div>
 										</form>
 									</div>
@@ -368,11 +329,11 @@ include '../php/conn.php';
 				</table>
 						
 				<!-- plan modal -->
-				 <div id="plan-modal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true" class="hidden fixed top-0 left-0 size-full z-50 items-center justify-center">
-					<div class="flex flex-col w-full max-w-md p-4 bg-white shadow-md rounded-md">
+				 <div id="plan-modal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true" class="hidden top-0 left-0 z-50 fixed justify-center items-center size-full">
+					<div class="flex flex-col bg-white shadow-md p-4 rounded-md w-full max-w-md">
 						<div class="flex flex-row justify-between items-center mb-4">
-							<span id="header" class="text-xl font-bold">New Plan</span>
-							<button data-modal-target="plan-modal" data-modal-toggle="plan-modal" class="text-gray-400 bg-transparent hover:bg-primary transition-colors duration-200 rounded-lg text-sm w-8 h-8 flex justify-center items-center">
+							<span id="header" class="font-bold text-xl">New Plan</span>
+							<button data-modal-target="plan-modal" data-modal-toggle="plan-modal" class="flex justify-center items-center bg-transparent hover:bg-primary rounded-lg w-8 h-8 text-gray-400 text-sm transition-colors duration-200">
 								<box-icon name='x'></box-icon>
 							</button>
 						</div>
@@ -380,23 +341,23 @@ include '../php/conn.php';
 							<div class="flex flex-row gap-3">
 								<div class="flex flex-col flex-1">
 									<label for="title" class="mb-1">Title:</label>
-									<input type="text" name="Title" id="Title" placeholder="Enter audit plan title..." class="w-full border p-2 rounded" required>
+									<input type="text" name="Title" id="Title" placeholder="Enter audit plan title..." class="p-2 border rounded w-full" required>
 								</div>
 								<div class="flex flex-col flex-1">
 									<label for="department" class="mb-1">Department:</label>
-									<input type="text" name="Department" id="Department" placeholder="Enter department name..." class="w-full border p-2 rounded" required>
+									<input type="text" name="Department" id="Department" placeholder="Enter department name..." class="p-2 border rounded w-full" required>
 								</div>
 							</div>
 							<div class="flex flex-col">
 								<label for="scheduled-date" class="mb-1">Scheduled Date:</label>
-								<input type="date" name="ScheduledDate" id="ScheduledDate" class="w-full border p-2 rounded" required>
+								<input type="date" name="ScheduledDate" id="ScheduledDate" class="p-2 border rounded w-full" required>
 							</div>
 							<div class="flex flex-col">
 								<label for="description" class="mb-1">Description:</label>
-								<textarea name="Description" id="Description" placeholder="Enter audit plan description..." class="w-full border p-2 rounded min-h-[100px]" required></textarea>
+								<textarea name="Description" id="Description" placeholder="Enter audit plan description..." class="p-2 border rounded w-full min-h-[100px]" required></textarea>
 							</div>
 							<div class="flex justify-end gap-2 mt-2">
-								<button type="submit" class="px-4 py-2 bg-secondary text-white rounded-md hover:bg-opacity-90">Submit</button>
+								<button type="submit" class="bg-secondary hover:bg-opacity-90 px-4 py-2 rounded-md text-white">Submit</button>
 							</div>
 						</form>
 					</div>

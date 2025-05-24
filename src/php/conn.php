@@ -14,7 +14,6 @@ const DB_HOST = 'localhost';
 const DB_USER = 'root';
 const DB_PASS = '';
 const DB_NAME = 'logs2_audit_management';
-const DB_NAME_FINANCIALS = 'fin_general_ledger';
 
 // Mark as included
 define('DB_CONFIG_INCLUDED', true);
@@ -35,18 +34,9 @@ try {
         throw new Exception("Main database connection failed: " . $conn->connect_error);
     }
     
-    // Connect to financial audit database
-    $connFinancials = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME_FINANCIALS);
-    if ($connFinancials->connect_error) {
-        throw new Exception("Financial database connection failed: " . $connFinancials->connect_error);
-    }
-    
-    // Set charset for both connections
+    // Set charset for connection
     if (!$conn->set_charset("utf8mb4")) {
         throw new Exception("Error setting charset for main database: " . $conn->error);
-    }
-    if (!$connFinancials->set_charset("utf8mb4")) {
-        throw new Exception("Error setting charset for financial database: " . $connFinancials->error);
     }
 
     // Set timezone

@@ -96,24 +96,6 @@ $correctiveActions = $conn->query("
         ca.DueDate ASC 
     LIMIT 5");
 
-// Financial Audit Statistics
-$totalFinancialAudits = $conn->query("SELECT COUNT(*) as count FROM financial_audit_gl")->fetch_assoc()['count'];
-$pendingFinancialAudits = $conn->query("SELECT COUNT(*) as count FROM financial_audit_gl WHERE Status = 'Pending'")->fetch_assoc()['count'];
-$flaggedEntries = $conn->query("SELECT COUNT(*) as count FROM financial_audit_gl WHERE Status = 'Flagged'")->fetch_assoc()['count'];
-$reviewedEntries = $conn->query("SELECT COUNT(*) as count FROM financial_audit_gl WHERE Status = 'Reviewed'")->fetch_assoc()['count'];
-
-// Financial audit completion rate
-$totalJournalEntries = $conn->query("SELECT COUNT(*) as count FROM journalentries")->fetch_assoc()['count'];
-$auditCompletionRate = $totalJournalEntries > 0 ? round(($totalFinancialAudits / $totalJournalEntries) * 100, 1) : 0;
-
-// Month-over-month financial audit change
-$currentMonthFinAudits = $conn->query("SELECT COUNT(*) as count FROM financial_audit_gl 
-    WHERE MONTH(AuditDate) = $currentMonth AND YEAR(AuditDate) = $currentYear")->fetch_assoc()['count'];
-$lastMonthFinAudits = $conn->query("SELECT COUNT(*) as count FROM financial_audit_gl 
-    WHERE MONTH(AuditDate) = $lastMonth AND YEAR(AuditDate) = $lastYear")->fetch_assoc()['count'];
-$finAuditChange = $lastMonthFinAudits > 0 ? 
-    round((($currentMonthFinAudits - $lastMonthFinAudits) / $lastMonthFinAudits) * 100, 1) : 0;
-
 ?>
 
 <!DOCTYPE html>
@@ -132,172 +114,110 @@ $finAuditChange = $lastMonthFinAudits > 0 ?
 	<title>Audit Management</title>
 </head>
 <body class="overflow-hidden">
-	<div id="container" class="w-full h-screen flex flex-col">
-		<div id="header" class="w-full min-h-20 max-h-20 bg-white border-b-2 border-accent">
-			<div class="w-70 h-full flex items-center px-3 py-2 border-r-2 border-accent">
-				<img class="size-full" src="../assets/logo.svg" alt="">
-			</div>
-		</div>
-		<div class="flex-1 flex flex-row overflow-hidden">
-			<div id="sidebar" class="min-w-70 px-3 py-2 h-full flex flex-col gap-3 bg-white border-r-2 border-accent">
-				<span id="header" class="text-2xl font-bold w-full h-fit text-center">Audit Management</span>
-				<a href="dashboard.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-white text-[#4E3B2A]">
-					<box-icon name='dashboard' type='solid' color='#4E3B2A'></box-icon>
-					<span>Dashboard</span>
-				</a>
-				<a href="audit-plan.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A]">
-					<box-icon name='calendar-check' type='solid' color='#4E3B2A'></box-icon>
-					<span>Audit Plan</span>
-				</a>
-				<a href="audit-conduct.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A]">
-					<box-icon name='file-doc' type='solid' color='#4E3B2A'></box-icon>
-					<span>Conduct Audit</span>
-				</a>
-				<a href="financial-audit-gl.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-white text-[#4E3B2A] hover:bg-accent hover:text-white transition-colors duration-200">
-                    <box-icon name='dollar-circle' type='solid' color='#4E3B2A'></box-icon>
-                    <span>Financial Audit (GL)</span>
-                </a>
-				<a href="audit-findings.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A]">
-					<box-icon name='search-alt-2' type='solid' color='#4E3B2A'></box-icon>
-					<span>Findings</span>
-				</a>
-				<a href="audit-actions.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A]">
-					<box-icon name='check-square' type='solid' color='#4E3B2A'></box-icon>
-					<span>Corrective Actions</span>
-				</a>
-
-				<a href="audit-logs.php" class="w-full flex flex-row gap-2 px-3 py-2 rounded-md border-2 border-accent text-[#4E3B2A]">
-					<box-icon name='time-five' type='solid' color='#4E3B2A'></box-icon>
-					<span>Audit Logs</span>
-				</a>
-			</div>
-			<div id="main" class="flex-1 flex flex-col gap-4 p-6 bg-primary overflow-y-auto">
+	<div id="container" class="flex flex-col w-full h-screen">
+		<?php include '../components/topbar.php'; ?>
+		<div class="flex flex-row flex-1 overflow-hidden">
+			<?php include '../components/sidebar.php'; ?>
+			<div id="main" class="flex flex-col flex-1 gap-4 bg-primary p-6 overflow-y-auto">
 				<!-- Dashboard Header -->
 				<div class="flex justify-between items-center mb-6">
-					<h1 id="header" class="text-2xl font-bold text-[#4E3B2A]">Dashboard Overview</h1>
+					<h1 id="header" class="font-bold text-[#4E3B2A] text-2xl">Dashboard Overview</h1>
 				</div>
 
 				<!-- Stats Cards -->
-				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+				<div class="gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mb-6">
 					<!-- Total Audits Card -->
-					<div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
-						<div class="flex items-start justify-between">
+					<div class="bg-white shadow-sm hover:shadow-md p-4 rounded-lg transition-all duration-300">
+						<div class="flex justify-between items-start">
 							<div>
-								<p class="text-sm font-semibold mb-1 text-gray-600">Total Audits</p>
-								<p class="text-2xl font-bold text-[#4E3B2A]"><?= $totalAudits ?></p>
+								<p class="mb-1 font-semibold text-gray-600 text-sm">Total Audits</p>
+								<p class="font-bold text-[#4E3B2A] text-2xl"><?= $totalAudits ?></p>
 								<div class="flex items-center mt-2">
 									<span class="text-sm <?= $auditChange >= 0 ? 'text-green-600' : 'text-red-600' ?>">
 										<?= $auditChange ?>% <?= $auditChange >= 0 ? '↑' : '↓' ?>
 									</span>
-									<span class="text-xs text-gray-500 ml-1">vs last month</span>
+									<span class="ml-1 text-gray-500 text-xs">vs last month</span>
 								</div>
 							</div>
-							<div class="p-2 bg-blue-100 rounded-full">
+							<div class="bg-blue-100 p-2 rounded-full">
 								<box-icon name='file' type='solid' color='#3b82f6' size="md"></box-icon>
 							</div>
 						</div>
 					</div>
 					
 					<!-- Active Audits Card -->
-					<div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
-						<div class="flex items-start justify-between">
+					<div class="bg-white shadow-sm hover:shadow-md p-4 rounded-lg transition-all duration-300">
+						<div class="flex justify-between items-start">
 							<div>
-								<p class="text-sm font-semibold mb-1 text-gray-600">Active Audits</p>
-								<p class="text-2xl font-bold text-[#4E3B2A]"><?= $totalOngoing ?></p>
+								<p class="mb-1 font-semibold text-gray-600 text-sm">Active Audits</p>
+								<p class="font-bold text-[#4E3B2A] text-2xl"><?= $totalOngoing ?></p>
 								<div class="flex items-center mt-2">
-									<span class="text-xs text-gray-500">
+									<span class="text-gray-500 text-xs">
 										<?= $ongoingAudits ?> pending, <?= $underReviewAudits ?> in review
 									</span>
 								</div>
 							</div>
-							<div class="p-2 bg-yellow-100 rounded-full">
+							<div class="bg-yellow-100 p-2 rounded-full">
 								<box-icon name='loader-circle' type='solid' color='#eab308' size="md"></box-icon>
 							</div>
 						</div>
 					</div>
 
 					<!-- Compliance Rate Card -->
-					<div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
-						<div class="flex items-start justify-between">
+					<div class="bg-white shadow-sm hover:shadow-md p-4 rounded-lg transition-all duration-300">
+						<div class="flex justify-between items-start">
 							<div>
-								<p class="text-sm font-semibold mb-1 text-gray-600">Compliance Rate</p>
-								<p class="text-2xl font-bold text-[#4E3B2A]"><?= $complianceRate ?>%</p>
+								<p class="mb-1 font-semibold text-gray-600 text-sm">Compliance Rate</p>
+								<p class="font-bold text-[#4E3B2A] text-2xl"><?= $complianceRate ?>%</p>
 								<div class="flex items-center mt-2">
-									<span class="text-xs text-gray-500">
+									<span class="text-gray-500 text-xs">
 										<?= $compliantFindings ?> of <?= $totalFindings ?> compliant
 									</span>
 								</div>
 							</div>
-							<div class="p-2 bg-green-100 rounded-full">
+							<div class="bg-green-100 p-2 rounded-full">
 								<box-icon name='check-circle' type='solid' color='#22c55e' size="md"></box-icon>
-							</div>
-						</div>
-					</div>
-
-					<!-- Financial Audit Status Card -->
-					<div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
-						<div class="flex items-start justify-between">
-							<div>
-								<p class="text-sm font-semibold mb-1 text-gray-600">Financial Audits</p>
-								<p class="text-2xl font-bold text-[#4E3B2A]"><?= $auditCompletionRate ?>%</p>
-								<div class="flex items-center mt-2">
-									<span class="text-xs text-gray-500">
-										<?= $pendingFinancialAudits ?> pending, <?= $flaggedEntries ?> flagged
-									</span>
-								</div>
-							</div>
-							<div class="p-2 bg-purple-100 rounded-full">
-								<box-icon name='dollar-circle' type='solid' color='#a855f7' size="md"></box-icon>
 							</div>
 						</div>
 					</div>
 				</div>
 
 				<!-- Tables Grid -->
-				<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+				<div class="gap-6 grid grid-cols-1">
 					<!-- Scheduled Audit Plans -->
-					<div class="bg-white rounded-lg shadow-sm p-6">
+					<div class="bg-white shadow-sm mb-6 p-6 rounded-lg">
 						<div class="flex justify-between items-center mb-4">
-							<h2 class="text-lg font-semibold text-[#4E3B2A]">Scheduled Audit Plans</h2>
-							<a href="audit-plan.php" class="text-accent hover:underline">View All</a>
+							<h2 class="font-semibold text-[#4E3B2A] text-lg">Scheduled Audit Plans</h2>
+							<a href="audit-plan.php" class="text-text hover:underline">View All</a>
 						</div>
 						<?php include '../components/scheduled-audit-plans-table.php'; ?>
 					</div>
 
 					<!-- Open Audit Plans -->
-					<div class="bg-white rounded-lg shadow-sm p-6">
+					<div class="bg-white shadow-sm mb-6 p-6 rounded-lg">
 						<div class="flex justify-between items-center mb-4">
-							<h2 class="text-lg font-semibold text-[#4E3B2A]">Open Audit Plans</h2>
-							<a href="audit-plan.php" class="text-accent hover:underline">View All</a>
+							<h2 class="font-semibold text-[#4E3B2A] text-lg">Open Audit Plans</h2>
+							<a href="audit-plan.php" class="text-text hover:underline">View All</a>
 						</div>
 						<?php include '../components/open-audit-plans-table.php'; ?>
 					</div>
 
 					<!-- Recent Findings -->
-					<div class="bg-white rounded-lg shadow-sm p-6">
+					<div class="bg-white shadow-sm mb-6 p-6 rounded-lg">
 						<div class="flex justify-between items-center mb-4">
-							<h2 class="text-lg font-semibold text-[#4E3B2A]">Recent Findings</h2>
-							<a href="audit-findings.php" class="text-accent hover:underline">View All</a>
+							<h2 class="font-semibold text-[#4E3B2A] text-lg">Recent Findings</h2>
+							<a href="audit-findings.php" class="text-text hover:underline">View All</a>
 						</div>
 						<?php include '../components/recent-findings-table.php'; ?>
 					</div>
 
 					<!-- Pending Actions -->
-					<div class="bg-white rounded-lg shadow-sm p-6">
+					<div class="bg-white shadow-sm mb-6 p-6 rounded-lg">
 						<div class="flex justify-between items-center mb-4">
-							<h2 class="text-lg font-semibold text-[#4E3B2A]">Pending Actions</h2>
-							<a href="audit-actions.php" class="text-accent hover:underline">View All</a>
+							<h2 class="font-semibold text-[#4E3B2A] text-lg">Pending Actions</h2>
+							<a href="audit-actions.php" class="text-text hover:underline">View All</a>
 						</div>
 						<?php include '../components/pending-actions-table.php'; ?>
-					</div>
-
-					<!-- Recent Financial Audits -->
-					<div class="bg-white rounded-lg shadow-sm p-6">
-						<div class="flex justify-between items-center mb-4">
-							<h2 class="text-lg font-semibold text-[#4E3B2A]">Recent Financial Audits</h2>
-							<a href="financial-audit-gl.php" class="text-accent hover:underline">View All</a>
-						</div>
-						<?php include '../components/recent-financial-audits-table.php'; ?>
 					</div>
 				</div>
 			</div>
