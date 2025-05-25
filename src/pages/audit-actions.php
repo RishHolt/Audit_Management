@@ -206,7 +206,7 @@ if ($actionsResult && $actionsResult->num_rows > 0) {
 				<!-- Assign Action Modal -->
 				<div id="action-modal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true" class="hidden top-0 left-0 z-50 fixed justify-center items-center size-full">
 					<div class="flex flex-col bg-white shadow-md p-4 rounded-md w-full max-w-md">
-						<span class="mb-2 font-bold text-[#4E3B2A] text-xl">Assign Corrective Action</span>
+						<span id="header" class="mb-2 font-bold text-[#4E3B2A] text-xl">Assign Corrective Action</span>
 						<form id="assignActionForm" class="flex flex-col gap-3">
 							<div class="flex flex-row gap-3">
 								<div class="flex flex-col flex-1">
